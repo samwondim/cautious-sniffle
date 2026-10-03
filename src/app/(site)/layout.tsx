@@ -1,6 +1,7 @@
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
 import { getAccent, getSiteContent } from "@/lib/content";
+import type { LayoutProps } from "@/types";
 
 /**
  * Public pages read live CMS content from Postgres, so they must never be

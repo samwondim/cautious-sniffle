@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Figtree } from "next/font/google";
 
+import type { LayoutProps } from "@/types";
+
 import "./globals.css";
 
 /**

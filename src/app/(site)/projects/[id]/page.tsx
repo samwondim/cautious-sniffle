@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Icon } from "@/components/icons";
 import { PlaceholderPhoto, Section } from "@/components/section";
 import { getPublishedProject, getSiteContent } from "@/lib/content";
+import type { PageProps } from "@/types";
 
 /** Ids are the primary key, so anything non-numeric is a 404, not a lookup. */
 function parseId(raw: string): number | null {
