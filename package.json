@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "db:create": "tsx scripts/db-create.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/db-migrate.ts",
@@ -44,9 +44,5 @@
     "@esbuild-kit/core-utils": {
       "esbuild": "^0.25.0"
     }
-  },
-  "optionalDependencies": {
-    "@tailwindcss/oxide-linux-x64-gnu": "^4.3.3",
-    "lightningcss-linux-x64-gnu": "^1.33.0"
   }
 }

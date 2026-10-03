@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import { Eyebrow, PlaceholderPhoto, Section, SectionTitle } from "@/components/section";
 import type { GalleryImage } from "@/db/schema";
 import type { SiteContent } from "@/lib/content";
