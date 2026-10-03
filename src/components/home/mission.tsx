@@ -1,0 +1,87 @@
+import { Icon } from "@/components/icons";
+import { PlaceholderPhoto, Section } from "@/components/section";
+import type { SiteContent } from "@/lib/content";
+
+/** "Who We Are" — mission and vision, beside a photo slot. */
+export function Mission({ content }: { content: SiteContent }) {
+  return (
+    <Section id="mission" className="lg:py-28">
+      <div className="flex flex-col items-center gap-12 lg:flex-row lg:gap-18">
+        <div className="relative hidden h-[560px] w-[500px] shrink-0 lg:block">
+          <div
+            className="absolute right-[10px] top-0 h-[300px] w-[300px] rounded-full"
+            style={{ background: "rgba(62,172,180,0.14)" }}
+          />
+          <div
+            className="absolute bottom-0 left-0 h-[240px] w-[240px] rounded-3xl"
+            style={{ background: "rgba(59,152,97,0.12)" }}
+          />
+          <div className="absolute top-[30px] left-[10px] h-[500px] w-[440px]">
+            <PlaceholderPhoto
+              seed="eh-mission-portrait"
+              alt={content["mission.photoCaption"] || ""}
+              sizes="440px"
+              width={880}
+              height={1000}
+              className="h-full w-full rounded-[20px] border border-hairline-strong"
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-1 flex-col gap-6">
+          {content["mission.eyebrow"] ? (
+            <span className="inline-flex w-fit items-center rounded-full border border-accent/20 bg-accent/8 px-[18px] py-2 text-[13px] font-semibold text-accent">
+              {content["mission.eyebrow"]}
+            </span>
+          ) : null}
+
+          <h2 className="font-display text-[40px] leading-[1.1] text-ink md:text-[52px]">
+            {content["mission.title"]}
+          </h2>
+
+          {content["mission.body"] ? (
+            <p className="max-w-[520px] text-[17px] leading-[1.65] text-slate">
+              {content["mission.body"]}
+            </p>
+          ) : null}
+
+          <div className="mt-2 flex flex-col gap-[22px]">
+            <div className="flex items-start gap-4">
+              <div
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+                style={{ background: "rgba(62,172,180,0.14)" }}
+              >
+                <Icon name="flag" size={20} className="text-accent" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <h3 className="text-base font-semibold text-ink">
+                  {content["mission.missionTitle"]}
+                </h3>
+                <p className="max-w-[460px] text-[15px] leading-[1.55] text-slate">
+                  {content["mission.missionBody"]}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-4">
+              <div
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+                style={{ background: "rgba(59,152,97,0.12)" }}
+              >
+                <Icon name="eye" size={20} className="text-growth" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <h3 className="text-base font-semibold text-ink">
+                  {content["mission.visionTitle"]}
+                </h3>
+                <p className="max-w-[460px] text-[15px] leading-[1.55] text-slate">
+                  {content["mission.visionBody"]}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Section>
+  );
+}

@@ -1,0 +1,244 @@
+@import "tailwindcss";
+
+/* -------------------------------------------------------------------------- */
+/* Design tokens — lifted from the approved "Multi-Sector NGO" design.        */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  /* Empower Humanity brand guidelines */
+  --ink: #103c46; /* Deep teal ink — primary text + dark bands */
+  --ink-deep: #103c46; /* footer / hero band */
+  --teal: #3eacb4; /* Primary. Backgrounds and headers. */
+  --teal-strong: #2f878f; /* teal hover / raised */
+  --sky: #3ca4c0; /* Secondary. Links and charts. */
+  --orange: #e16d2d; /* Human orange. Accent. Buttons, key moments. Reserved for Donate. */
+  --orange-strong: #c25a24; /* Donate hover */
+  --growth: #3b9861; /* Growth green. Accent. Health and progress. */
+  --gold: #e8b02e; /* Sun gold. Accent. Highlights and warmth. */
+
+  /* Back-compat aliases for existing `bg-forest` / `text-olive` / `bg-accent` usage */
+  --forest: var(--teal); /* hero glass tiles */
+  --forest-light: var(--sky); /* hero tile, raised */
+  --olive: var(--growth);
+
+  /* Accent is themed at runtime from the `theme` table in Postgres and set  */
+  /* as an inline custom property on <html> by the root layout.              */
+  --accent: var(--teal);
+  --accent-strong: var(--teal-strong); /* teal hover */
+
+  /* Warm + supporting */
+  --mint: #edf6f7; /* alternating light band (pale teal) */
+  --cream: #fef6e0; /* "Our Work" band (pale gold) */
+  --sage: #6f8f96; /* muted labels on dark */
+  --mist: #d4e7ea; /* body copy on dark */
+  --slate: #47646b; /* body copy on light (ink at ~70%) */
+  --hairline: rgba(16, 60, 70, 0.16);
+  --hairline-strong: rgba(16, 60, 70, 0.28);
+
+  --background: #ffffff;
+  --foreground: var(--ink);
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-deep: var(--ink-deep);
+  --color-teal: var(--teal);
+  --color-teal-strong: var(--teal-strong);
+  --color-sky: var(--sky);
+  --color-orange: var(--orange);
+  --color-orange-strong: var(--orange-strong);
+  --color-growth: var(--growth);
+  --color-forest: var(--forest);
+  --color-forest-light: var(--forest-light);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-olive: var(--olive);
+  --color-gold: var(--gold);
+  --color-mint: var(--mint);
+  --color-cream: var(--cream);
+  --color-sage: var(--sage);
+  --color-mist: var(--mist);
+  --color-slate: var(--slate);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --font-sans: var(--font-figtree), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Arial, sans-serif;
+  --font-display: var(--font-bricolage), var(--font-figtree), Arial, sans-serif;
+
+  /* Type scale from the design */
+  --text-display: 3.5rem; /* 56px hero */
+  --text-display--line-height: 1.15;
+  --text-section: 2.125rem; /* 34px section titles */
+  --text-section--line-height: 1.2;
+  --text-stat: 1.125rem; /* 18px stat numbers */
+}
+
+/* -------------------------------------------------------------------------- */
+/* Base                                                                       */
+/* -------------------------------------------------------------------------- */
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p {
+    margin: 0;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Design: Bricolage Grotesque Bold is the display voice for headings. */
+  .font-display {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  body {
+    line-height: 1.5;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Small shared primitives                                                    */
+/* -------------------------------------------------------------------------- */
+
+@layer components {
+  .eyebrow {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .field-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+
+  .field-input {
+    height: 46px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 14px;
+    border: 1px solid rgba(16, 60, 70, 0.3);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: var(--font-sans);
+    color: var(--ink);
+    background: #ffffff;
+  }
+
+  .field-input::placeholder {
+    color: #7d949a;
+  }
+
+  /* Filled, borderless variant used on the volunteer panel, where the design
+     shows soft grey fields on white. Labels stay in the DOM but visually
+     hidden, so the placeholder-only look does not cost screen reader users
+     the field name. */
+  .field-input-soft {
+    height: 52px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 18px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: var(--font-sans);
+    color: var(--ink);
+    background: #f1f3f2;
+  }
+
+  .field-input-soft::placeholder {
+    color: #7d949a;
+  }
+
+  .field-input-soft:focus {
+    border-color: var(--teal);
+    background: #ffffff;
+  }
+
+  /* Brand buttons — pill per guidelines. Human orange is reserved for the
+     one action we most want (Donate); everything else uses the teal outline. */
+  .btn-donate {
+    border-radius: 9999px;
+    background: var(--orange);
+    color: #ffffff;
+    transition:
+      background-color 150ms ease,
+      opacity 150ms ease;
+  }
+
+  .btn-donate:hover {
+    background: var(--orange-strong);
+  }
+
+  .btn-secondary {
+    border-radius: 9999px;
+    border: 1.5px solid var(--teal);
+    color: var(--ink);
+    background: transparent;
+    transition:
+      background-color 150ms ease,
+      color 150ms ease;
+  }
+
+  .btn-secondary:hover {
+    background: var(--teal);
+    color: var(--ink);
+  }
+
+  .btn-secondary-on-dark {
+    border-color: #ffffff;
+    color: #ffffff;
+  }
+
+  .btn-secondary-on-dark:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Print (matches the design's print baseline)                                */
+/* -------------------------------------------------------------------------- */
+
+@media print {
+  @page {
+    margin: 0.5cm;
+  }
+
+  *,
+  *::before,
+  *::after {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
