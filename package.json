@@ -44,5 +44,9 @@
     "@esbuild-kit/core-utils": {
       "esbuild": "^0.25.0"
     }
+  },
+  "optionalDependencies": {
+    "@tailwindcss/oxide-linux-x64-gnu": "^4.3.3",
+    "lightningcss-linux-x64-gnu": "^1.33.0"
   }
 }
