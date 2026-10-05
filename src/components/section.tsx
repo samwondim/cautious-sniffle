@@ -89,6 +89,7 @@ export function PlaceholderPhoto({
   width,
   height,
   className = "",
+  priority = false,
 }: {
   /** Stable seed — the same seed always resolves to the same photograph. */
   seed: string;
@@ -100,6 +101,8 @@ export function PlaceholderPhoto({
   width: number;
   height: number;
   className?: string;
+  /** Set on the photo a page paints first, so it is not lazy-loaded. */
+  priority?: boolean;
 }) {
   return (
     <div className={`relative overflow-hidden bg-mint ${className}`}>
@@ -108,6 +111,7 @@ export function PlaceholderPhoto({
         alt={alt}
         fill
         sizes={sizes}
+        priority={priority}
         className="object-cover"
       />
     </div>

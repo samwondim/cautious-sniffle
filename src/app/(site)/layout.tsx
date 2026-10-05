@@ -1,3 +1,4 @@
+import { MotionProvider } from "@/components/motion/motion-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
 import { getAccent, getSiteContent } from "@/lib/content";
@@ -16,9 +17,20 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
       style={{ "--accent": accent } as React.CSSProperties}
       className="flex min-h-full flex-1 flex-col"
     >
-      <SiteNav content={content} />
-      <main className="flex-1">{children}</main>
-      <SiteFooter content={content} />
+      {/* Scroll reveals ship their `initial` state as an inline `opacity: 0`,
+          so without JavaScript the bands would never appear. Only
+          `!important` beats an inline style. */}
+      <noscript>
+        <style>{`[data-reveal]{opacity:1!important;transform:none!important}[data-countup]{visibility:visible!important}`}</style>
+      </noscript>
+
+      {/* Wraps the header too: the mobile menu animates, and it must honour
+          the Reduced Motion setting like everything else. */}
+      <MotionProvider>
+        <SiteNav content={content} />
+        <main className="flex-1">{children}</main>
+        <SiteFooter content={content} />
+      </MotionProvider>
     </div>
   );
 }

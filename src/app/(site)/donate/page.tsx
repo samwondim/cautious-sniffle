@@ -1,5 +1,7 @@
+import * as motion from "motion/react-client";
 import Link from "next/link";
 
+import { BandSeam } from "@/components/band-seam";
 import { CopyValue } from "@/components/copy-value";
 import { Icon, toIconName } from "@/components/icons";
 import { Eyebrow, Section, SectionTitle } from "@/components/section";
@@ -9,6 +11,7 @@ import {
   getPublishedGivingOptions,
   getSiteContent,
 } from "@/lib/content";
+import { fadeIn, reveal } from "@/lib/motion";
 
 export const metadata = {
   title: "Donate",
@@ -16,18 +19,29 @@ export const metadata = {
 };
 
 /** One account, rendered as a definition list so labels pair with values. */
-function AccountCard({ account }: { account: BankAccount }) {
+function AccountCard({
+  account,
+  index,
+}: {
+  account: BankAccount;
+  index: number;
+}) {
   const rows: { label: string; value: string; copyable?: boolean }[] = [
     { label: "Account name", value: account.accountName },
     { label: "Account number", value: account.accountNumber, copyable: true },
   ];
   if (account.swiftCode) {
-    rows.push({ label: "SWIFT / BIC", value: account.swiftCode, copyable: true });
+    rows.push({
+      label: "SWIFT / BIC",
+      value: account.swiftCode,
+      copyable: true,
+    });
   }
   if (account.branch) rows.push({ label: "Branch", value: account.branch });
 
   return (
-    <article
+    <motion.article
+      {...reveal({ index })}
       className="flex flex-col gap-5 rounded-2xl border border-hairline bg-white p-6"
       style={{ boxShadow: "0 12px 28px rgba(16,60,70,0.08)" }}
     >
@@ -46,7 +60,9 @@ function AccountCard({ account }: { account: BankAccount }) {
               name={account.scope === "international" ? "globe" : "building"}
               size={20}
               className={
-                account.scope === "international" ? "text-growth" : "text-accent"
+                account.scope === "international"
+                  ? "text-growth"
+                  : "text-accent"
               }
             />
           </div>
@@ -85,7 +101,7 @@ function AccountCard({ account }: { account: BankAccount }) {
           {account.note}
         </p>
       ) : null}
-    </article>
+    </motion.article>
   );
 }
 
@@ -101,17 +117,17 @@ function AccountGroup({
   if (accounts.length === 0) return null;
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex max-w-[620px] flex-col gap-2">
+      <motion.div {...reveal()} className="flex max-w-[620px] flex-col gap-2">
         <h2 className="font-display text-[30px] text-ink md:text-[34px]">
           {title}
         </h2>
         {body ? (
           <p className="text-[16px] leading-[1.6] text-slate">{body}</p>
         ) : null}
-      </div>
+      </motion.div>
       <div className="grid gap-6 md:grid-cols-2">
-        {accounts.map((account) => (
-          <AccountCard key={account.id} account={account} />
+        {accounts.map((account, index) => (
+          <AccountCard key={account.id} account={account} index={index} />
         ))}
       </div>
     </div>
@@ -150,13 +166,18 @@ export default async function DonatePage() {
           {notice ? (
             // Guardrail while the seeded account numbers are placeholders.
             // Clearing `donate.placeholderNotice` removes this banner.
-            <p
+            <motion.p
               role="note"
+              {...fadeIn({ amount: 0.6 })}
               className="flex items-start gap-3 rounded-xl border border-gold bg-gold/12 px-5 py-4 text-[15px] leading-[1.55] text-ink"
             >
-              <Icon name="flag" size={18} className="mt-0.5 shrink-0 text-ink" />
+              <Icon
+                name="flag"
+                size={18}
+                className="mt-0.5 shrink-0 text-ink"
+              />
               {notice}
-            </p>
+            </motion.p>
           ) : null}
 
           <AccountGroup
@@ -186,48 +207,58 @@ export default async function DonatePage() {
       </Section>
 
       {givingOptions.length > 0 ? (
-        <Section tone="mint">
-          <div className="flex flex-col gap-3">
-            <Eyebrow>{content["donate.eyebrow"]}</Eyebrow>
-            <SectionTitle>{content["donate.impactTitle"]}</SectionTitle>
-          </div>
-          <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {givingOptions.map((option, index) => (
-              <div
-                key={option.id}
-                className="flex flex-col gap-2.5 border-t-2 pt-5"
-                style={{
-                  borderTopColor:
-                    index % 2 === 1 ? "var(--growth)" : "var(--teal)",
-                }}
-              >
-                <Icon
-                  name={toIconName(option.icon)}
-                  size={28}
-                  className={index % 2 === 1 ? "text-growth" : "text-accent"}
-                />
-                <h3 className="text-[17px] font-semibold">{option.title}</h3>
-                <p className="text-sm leading-[1.55] text-slate">
-                  {option.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Section>
+        <>
+          <BandSeam from="white" to="mint" side="right" />
+          <Section tone="mint">
+            <motion.div {...reveal()} className="flex flex-col gap-3">
+              <Eyebrow>{content["donate.eyebrow"]}</Eyebrow>
+              <SectionTitle>{content["donate.impactTitle"]}</SectionTitle>
+            </motion.div>
+            <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {givingOptions.map((option, index) => (
+                <motion.div
+                  key={option.id}
+                  {...reveal({ index, distance: 20 })}
+                  className="flex flex-col gap-2.5 border-t-2 pt-5"
+                  style={{
+                    borderTopColor:
+                      index % 2 === 1 ? "var(--growth)" : "var(--teal)",
+                  }}
+                >
+                  <Icon
+                    name={toIconName(option.icon)}
+                    size={28}
+                    className={index % 2 === 1 ? "text-growth" : "text-accent"}
+                  />
+                  <h3 className="text-[17px] font-semibold">{option.title}</h3>
+                  <p className="text-sm leading-[1.55] text-slate">
+                    {option.description}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </Section>
+          <BandSeam from="mint" to="white" side="left" />
+        </>
       ) : null}
 
       {content["donate.secureBody"] ? (
         <Section>
-          <div className="mx-auto flex max-w-[720px] flex-col items-center gap-3 text-center">
+          <motion.div
+            {...reveal({ distance: 16, amount: 0.5 })}
+            className="mx-auto flex max-w-[720px] flex-col items-center gap-3 text-center"
+          >
             <h2 className="font-display text-[26px] text-ink">
               {content["donate.secureTitle"]}
             </h2>
             <p className="text-[16px] leading-[1.65] text-slate">
               {content["donate.secureBody"]}
             </p>
-          </div>
+          </motion.div>
         </Section>
       ) : null}
+
+      <BandSeam from="white" to="ink-deep" side="right" />
     </>
   );
 }

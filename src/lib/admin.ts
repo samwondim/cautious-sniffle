@@ -9,6 +9,15 @@ const name = z.string().trim().min(1, "Required.").max(200);
 const shortText = z.string().trim().max(200);
 const longText = z.string().trim().max(5000);
 
+/** Optional free text: blank becomes null, so an unset field stays unset. */
+const optionalText = (max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max)
+    .optional()
+    .transform((v) => (v ? v : null));
+
 /**
  * An image reference on a content row: a media-library reference
  * (`media:12`) or an external URL. Empty becomes null, which renders
@@ -51,6 +60,10 @@ export const projectSchema = z.object({
     .optional()
     .transform((v) => (v ? v : null)),
   imageUrl: imageRefSchema,
+  partner: optionalText(160),
+  timeframe: optionalText(120),
+  beneficiaries: optionalText(120),
+  outcomes: optionalText(4000),
   sortOrder: z.coerce.number().int().default(0),
   status: z.enum(["draft", "published"]).default("draft"),
 });

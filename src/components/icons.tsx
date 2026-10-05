@@ -23,7 +23,8 @@ export type IconName =
   | "phone"
   | "map-pin"
   | "arrow-right"
-  | "hand-heart";
+  | "hand-heart"
+  | "check";
 
 type IconProps = SVGProps<SVGSVGElement> & { name: IconName; size?: number };
 
@@ -34,6 +35,7 @@ const PATHS: Record<IconName, React.ReactNode> = {
       <path d="M12 8v8M8 12h8" />
     </>
   ),
+  check: <path d="M5 12.5l4.5 4.5L19 7" />,
   "book-open": (
     <>
       <path d="M3 6.5c2.5-1.5 5.5-1.5 8 0v11c-2.5-1.5-5.5-1.5-8 0v-11z" />

@@ -3,13 +3,7 @@ import Link from "next/link";
 
 import { MobileMenu } from "@/components/mobile-menu";
 import type { SiteContent } from "@/lib/content";
-
-const NAV_ITEMS = [
-  { key: "nav.mission", href: "/#mission" },
-  { key: "nav.sectors", href: "/#what-we-do" },
-  { key: "nav.work", href: "/#work" },
-  { key: "nav.contact", href: "/#contact" },
-] as const;
+import { PRIMARY_NAV } from "@/lib/navigation";
 
 export function SiteNav({ content }: { content: SiteContent }) {
   return (
@@ -31,14 +25,16 @@ export function SiteNav({ content }: { content: SiteContent }) {
           <span className="sr-only">{content["org.name"]}</span>
         </Link>
 
-        <nav className="hidden items-center gap-10 md:flex">
-          {NAV_ITEMS.map((item) => (
+        {/* Six links at `md` is tight, so the gap grows with the viewport
+            rather than wrapping the row. */}
+        <nav className="hidden items-center gap-5 md:flex lg:gap-8">
+          {PRIMARY_NAV.map((item) => (
             <Link
-              key={item.key}
+              key={item.href}
               href={item.href}
               className="text-[15px] font-medium transition-opacity hover:opacity-60"
             >
-              {content[item.key]}
+              {content[item.key] || item.fallback}
             </Link>
           ))}
           <Link
@@ -50,9 +46,9 @@ export function SiteNav({ content }: { content: SiteContent }) {
         </nav>
 
         <MobileMenu
-          items={NAV_ITEMS.map((item) => ({
+          items={PRIMARY_NAV.map((item) => ({
             href: item.href,
-            label: content[item.key],
+            label: content[item.key] || item.fallback,
           }))}
           donateHref="/donate"
           donateLabel={content["nav.donate"]}
