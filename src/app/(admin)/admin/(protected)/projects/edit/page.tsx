@@ -36,6 +36,10 @@ export default async function AdminProjectEditPage({
         summary: row.summary,
         body: row.body,
         imageUrl: row.imageUrl,
+        partner: row.partner,
+        timeframe: row.timeframe,
+        beneficiaries: row.beneficiaries,
+        outcomes: row.outcomes,
         sortOrder: row.sortOrder,
         status: row.status,
       };
@@ -76,6 +80,31 @@ export default async function AdminProjectEditPage({
             },
             { name: "summary", label: "Summary (card)", type: "textarea" },
             { name: "body", label: "Body (detail page)", type: "textarea", rows: 6 },
+            {
+              name: "partner",
+              label: "Partner",
+              type: "text",
+              hint: "Who the work is delivered with. Shown in the facts card.",
+            },
+            {
+              name: "timeframe",
+              label: "Timeframe",
+              type: "text",
+              hint: "Free text, e.g. \u201C2024 \u2014 ongoing\u201D.",
+            },
+            {
+              name: "beneficiaries",
+              label: "People reached",
+              type: "text",
+              hint: "Short figure, e.g. \u201C640 mothers\u201D.",
+            },
+            {
+              name: "outcomes",
+              label: "Outcomes",
+              type: "textarea",
+              rows: 5,
+              hint: "One per line. Rendered as a checked list.",
+            },
             {
               name: "imageUrl",
               label: "Image",

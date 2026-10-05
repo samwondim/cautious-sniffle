@@ -39,10 +39,16 @@ export default async function WorkPage() {
 
       <PageCta
         seamSide="left"
-        title={content["give.title"] || "Support this work"}
+        title={content["work.ctaTitle"] || "Support this work"}
         body={content["give.body"]}
-        primary={{ label: content["give.ctaLabel"] || "Donate", href: "/donate" }}
-        secondary={{ label: "Volunteer with us", href: "/#volunteer" }}
+        primary={{
+          label: content["give.ctaLabel"] || "Donate",
+          href: content["give.ctaHref"] || "/donate",
+        }}
+        secondary={{
+          label: content["volunteer.eyebrow"] || "Get Involved",
+          href: "/#volunteer",
+        }}
         tone="white"
       />
     </>

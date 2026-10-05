@@ -30,10 +30,15 @@ export default async function AboutPage() {
 
       <PageCta
         seamSide="left"
-        title="See what that looks like in practice"
+        title={
+          content["mission.ctaTitle"] || "See what that looks like in practice"
+        }
         body={content["work.subtitle"]}
-        primary={{ label: "Our Work", href: "/work" }}
-        secondary={{ label: "What We Do", href: "/what-we-do" }}
+        primary={{ label: content["nav.work"] || "Our Work", href: "/work" }}
+        secondary={{
+          label: content["nav.sectors"] || "What We Do",
+          href: "/what-we-do",
+        }}
       />
     </>
   );

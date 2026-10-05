@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { StatValue } from "@/components/home/stat-value";
 import { Icon, Squiggle, toIconName } from "@/components/icons";
+import { ManagedBackdrop } from "@/components/managed-image";
 import type { ImpactStat } from "@/db/schema";
 import type { SiteContent } from "@/lib/content";
 import {
@@ -37,14 +37,56 @@ type TileSpec = {
   photoId: number;
   /** The centre tile overlaps the four around it. */
   z: number;
+  /** `site_content` key the admin can point at its own photograph. */
+  contentKey: string;
 };
 
 const TILES: TileSpec[] = [
-  { x: 133, y: 40, w: 277, h: 285, photoId: 646, z: 2 },
-  { x: 485, y: 65, w: 235, h: 250, photoId: 129, z: 2 },
-  { x: 296, y: 196, w: 296, h: 297, photoId: 64, z: 3 },
-  { x: 175, y: 380, w: 235, h: 245, photoId: 65, z: 1 },
-  { x: 490, y: 395, w: 260, h: 270, photoId: 342, z: 1 },
+  {
+    x: 133,
+    y: 40,
+    w: 277,
+    h: 285,
+    photoId: 646,
+    z: 2,
+    contentKey: "hero.tile1Image",
+  },
+  {
+    x: 485,
+    y: 65,
+    w: 235,
+    h: 250,
+    photoId: 129,
+    z: 2,
+    contentKey: "hero.tile2Image",
+  },
+  {
+    x: 296,
+    y: 196,
+    w: 296,
+    h: 297,
+    photoId: 64,
+    z: 3,
+    contentKey: "hero.tile3Image",
+  },
+  {
+    x: 175,
+    y: 380,
+    w: 235,
+    h: 245,
+    photoId: 65,
+    z: 1,
+    contentKey: "hero.tile4Image",
+  },
+  {
+    x: 490,
+    y: 395,
+    w: 260,
+    h: 270,
+    photoId: 342,
+    z: 1,
+    contentKey: "hero.tile5Image",
+  },
 ];
 
 /**
@@ -71,7 +113,15 @@ function Arc({ radius, color }: { radius: number; color: string }) {
   );
 }
 
-function Tile({ x, y, w, h, photoId, z }: TileSpec) {
+function Tile({
+  tile,
+  image,
+}: {
+  tile: TileSpec;
+  /** Admin-supplied photograph for this tile, if there is one. */
+  image: string | undefined;
+}) {
+  const { x, y, w, h, photoId, z } = tile;
   const width = scale(w);
   const height = scale(h);
   return (
@@ -86,14 +136,13 @@ function Tile({ x, y, w, h, photoId, z }: TileSpec) {
         boxShadow: "0 18px 32px rgba(16,60,70,0.35)",
       }}
     >
-      <Image
-        src={placeholderPhotoById({
+      <ManagedBackdrop
+        value={image}
+        fallbackSrc={placeholderPhotoById({
           id: photoId,
           width: width * 2,
           height: height * 2,
         })}
-        alt=""
-        fill
         sizes={`${width}px`}
         className="object-cover grayscale transition-[filter] duration-500 ease-out group-hover:grayscale-0 motion-reduce:transition-none"
       />
@@ -116,21 +165,18 @@ export function Hero({
           colour, and the scrim over the photo holds the white headline above
           7:1 contrast even where the image runs bright. */}
       <div aria-hidden="true" className="absolute inset-0">
-        <Image
-          src={placeholderPhotoById({
+        <ManagedBackdrop
+          value={content["hero.backdropImage"]}
+          fallbackSrc={placeholderPhotoById({
             id: HERO_BACKDROP_ID,
             width: 2400,
             height: 1400,
           })}
-          alt=""
-          fill
           priority
-          sizes="100vw"
           // Sits under an 82-92% opaque scrim, so most of the detail is never
           // seen. Dropping quality trims the largest above-the-fold download
           // with no visible difference.
           quality={50}
-          className="object-cover"
         />
         <div
           className="absolute inset-0"
@@ -194,13 +240,20 @@ export function Hero({
             style={{ opacity: 0.92 }}
           >
             {/* Base layer — shows only in the corner beyond the outer arc. */}
-            <div className="absolute inset-0" style={{ background: "var(--growth)" }} />
+            <div
+              className="absolute inset-0"
+              style={{ background: "var(--growth)" }}
+            />
             <Arc radius={ARC_OUTER} color="var(--teal)" />
             <Arc radius={ARC_INNER} color="var(--growth)" />
           </div>
 
           {TILES.map((tile) => (
-            <Tile key={tile.photoId} {...tile} />
+            <Tile
+              key={tile.photoId}
+              tile={tile}
+              image={content[tile.contentKey]}
+            />
           ))}
         </div>
       </div>

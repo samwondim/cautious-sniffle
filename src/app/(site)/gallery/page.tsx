@@ -39,10 +39,15 @@ export default async function GalleryPage() {
 
       <PageCta
         seamSide="right"
-        title="Every photograph here is a project"
+        title={
+          content["gallery.ctaTitle"] || "Every photograph here is a project"
+        }
         body={content["work.subtitle"]}
-        primary={{ label: "See our work", href: "/work" }}
-        secondary={{ label: "Get involved", href: "/#volunteer" }}
+        primary={{ label: content["nav.work"] || "Our Work", href: "/work" }}
+        secondary={{
+          label: content["volunteer.eyebrow"] || "Get Involved",
+          href: "/#volunteer",
+        }}
       />
     </>
   );

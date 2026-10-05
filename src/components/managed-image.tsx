@@ -86,3 +86,60 @@ export function ManagedImage({
     </div>
   );
 }
+
+/**
+ * Backdrop variant: fills a frame the caller has already positioned.
+ *
+ * `ManagedImage` brings its own `relative` wrapper, which fights a parent that
+ * is already `absolute inset-0` — the hero and volunteer backdrops, and the
+ * hero collage tiles. This renders the picture alone, so the caller keeps
+ * ownership of the box.
+ *
+ * `fallbackSrc` is the designed stand-in for an empty slot, built with the
+ * helpers in `src/lib/placeholder-image.ts`.
+ */
+export function ManagedBackdrop({
+  value,
+  fallbackSrc,
+  alt = "",
+  sizes = "100vw",
+  quality,
+  priority,
+  className = "object-cover",
+}: {
+  value: string | null | undefined;
+  fallbackSrc: string;
+  /** Empty for decorative imagery, which is what every backdrop is. */
+  alt?: string;
+  sizes?: string;
+  quality?: number;
+  priority?: boolean;
+  className?: string;
+}) {
+  const resolved = resolveImageValue(value);
+
+  if (resolved.kind === "external") {
+    return (
+      /* Arbitrary external origin: not on the optimiser's allowlist. */
+      /* eslint-disable-next-line @next/next/no-img-element */
+      <img
+        src={resolved.url}
+        alt={alt}
+        loading={priority ? "eager" : "lazy"}
+        className={`absolute inset-0 h-full w-full ${className}`}
+      />
+    );
+  }
+
+  return (
+    <Image
+      src={resolved.kind === "placeholder" ? fallbackSrc : resolved.url}
+      alt={alt}
+      fill
+      sizes={sizes}
+      quality={quality}
+      priority={priority}
+      className={className}
+    />
+  );
+}

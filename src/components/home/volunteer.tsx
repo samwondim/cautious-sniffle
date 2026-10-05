@@ -1,8 +1,8 @@
 import * as motion from "motion/react-client";
-import Image from "next/image";
 import Link from "next/link";
 
 import { VolunteerForm } from "@/components/forms";
+import { ManagedBackdrop } from "@/components/managed-image";
 import type { SiteContent } from "@/lib/content";
 import { reveal } from "@/lib/motion";
 import { placeholderPhoto } from "@/lib/placeholder-image";
@@ -95,15 +95,13 @@ export function Volunteer({
       {/* Backdrop photograph, held in black and white so the green panel and
           the gold heading stay the only saturated things in the band. */}
       <div aria-hidden="true" className="absolute inset-0">
-        <Image
-          src={placeholderPhoto({
+        <ManagedBackdrop
+          value={content["volunteer.backdropImage"]}
+          fallbackSrc={placeholderPhoto({
             seed: "eh-volunteer-backdrop",
             width: 2400,
             height: 1600,
           })}
-          alt=""
-          fill
-          sizes="100vw"
           quality={50}
           className="object-cover grayscale"
         />

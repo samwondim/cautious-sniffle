@@ -1,7 +1,8 @@
 import * as motion from "motion/react-client";
 
 import { Icon } from "@/components/icons";
-import { PlaceholderPhoto, Section } from "@/components/section";
+import { ManagedImage } from "@/components/managed-image";
+import { Section } from "@/components/section";
 import type { SiteContent } from "@/lib/content";
 import { fadeIn, reveal } from "@/lib/motion";
 
@@ -37,12 +38,13 @@ export function Mission({
             style={{ background: "rgba(59,152,97,0.12)" }}
           />
           <div className="absolute top-[30px] left-[10px] h-[500px] w-[440px]">
-            <PlaceholderPhoto
-              seed="eh-mission-portrait"
+            <ManagedImage
+              value={content["mission.photo"]}
               alt={content["mission.photoCaption"] || ""}
               sizes="440px"
-              width={880}
-              height={1000}
+              placeholderSeed="eh-mission-portrait"
+              placeholderWidth={880}
+              placeholderHeight={1000}
               priority={photoPriority}
               className="h-full w-full rounded-[20px] border border-hairline-strong"
             />
@@ -69,7 +71,10 @@ export function Mission({
           ) : null}
 
           <div className="mt-2 flex flex-col gap-[22px]">
-            <motion.div {...reveal({ distance: 16 })} className="flex items-start gap-4">
+            <motion.div
+              {...reveal({ distance: 16 })}
+              className="flex items-start gap-4"
+            >
               <div
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
                 style={{ background: "rgba(62,172,180,0.14)" }}

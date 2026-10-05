@@ -161,6 +161,17 @@ export const projects = pgTable(
     summary: text("summary").notNull(),
     body: text("body"),
     imageUrl: text("image_url"),
+    /**
+     * Detail-page facts. All optional: a project with none of them still
+     * renders, it just shows a shorter "At a glance" card.
+     */
+    partner: varchar("partner", { length: 160 }),
+    /** Free text rather than dates — "2024 — ongoing" is what people write. */
+    timeframe: varchar("timeframe", { length: 120 }),
+    /** Who the work reached, e.g. "640 mothers". */
+    beneficiaries: varchar("beneficiaries", { length: 120 }),
+    /** One outcome per line; rendered as a list on the detail page. */
+    outcomes: text("outcomes"),
     sortOrder: integer("sort_order").notNull().default(0),
     status: publicationStatus("status").notNull().default("draft"),
     createdAt: timestamp("created_at", { withTimezone: true })

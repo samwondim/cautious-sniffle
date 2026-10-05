@@ -1,4 +1,4 @@
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, asc, eq, ne, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -34,15 +34,36 @@ const SETTING_DEFAULTS: SiteContent = {
   "hero.primaryHref": "#contact",
   "hero.secondaryLabel": "See Our Work",
   "hero.secondaryHref": "#work",
+  // Image slots. Empty means "use the designed placeholder photography"; a
+  // value is a media-library reference or a pasted URL, the same as every
+  // other image the admin manages.
+  "hero.backdropImage": "",
+  "hero.tile1Image": "",
+  "hero.tile2Image": "",
+  "hero.tile3Image": "",
+  "hero.tile4Image": "",
+  "hero.tile5Image": "",
+  "mission.photo": "",
+  "give.photo": "",
+  "volunteer.backdropImage": "",
   "sectors.title": "Four sectors, one shared goal.",
+  "sectors.moreLabel": "How we work in each sector",
+  "sectors.ctaTitle": "Projects in every one of these sectors",
   "work.title": "A selection of recent projects.",
+  "work.moreLabel": "See all projects",
+  "work.supportLabel": "Support this work",
+  "work.ctaTitle": "Support this work",
   "gallery.eyebrow": "Gallery",
   "gallery.title": "Moments from the field.",
   "gallery.subtitle":
     "A glimpse of the communities, teams, and places behind the work.",
+  "gallery.moreLabel": "View the full gallery",
+  "gallery.ctaTitle": "Every photograph here is a project",
   "give.title": "Ways to Give",
   "give.ctaLabel": "Donate Now",
   "give.ctaHref": "/donate",
+  "give.detailsLabel": "See bank transfer details",
+  "mission.ctaTitle": "See what that looks like in practice",
   "volunteer.title": "Become a volunteer.",
   // The volunteer heading is split across two colours, the same way the hero
   // title is. `volunteer.title` stays as the fallback for databases that have
@@ -168,6 +189,11 @@ export async function getPublishedProject(id: number) {
       summary: projects.summary,
       body: projects.body,
       imageUrl: projects.imageUrl,
+      partner: projects.partner,
+      timeframe: projects.timeframe,
+      beneficiaries: projects.beneficiaries,
+      outcomes: projects.outcomes,
+      sectorId: projects.sectorId,
       sectorName: sectors.name,
     })
     .from(projects)
@@ -175,4 +201,42 @@ export async function getPublishedProject(id: number) {
     .where(and(eq(projects.id, id), eq(projects.status, "published")))
     .limit(1);
   return row;
+}
+
+/**
+ * Other published projects to show at the foot of a detail page: same sector
+ * first, then anything else, so a project in a one-project sector still gets
+ * neighbours instead of an empty rail.
+ */
+export async function getRelatedProjects({
+  excludeId,
+  sectorId,
+  limit = 3,
+}: {
+  excludeId: number;
+  sectorId: number | null;
+  limit?: number;
+}) {
+  return db
+    .select({
+      id: projects.id,
+      title: projects.title,
+      location: projects.location,
+      summary: projects.summary,
+      imageUrl: projects.imageUrl,
+      sectorName: sectors.name,
+    })
+    .from(projects)
+    .leftJoin(sectors, eq(projects.sectorId, sectors.id))
+    .where(
+      and(eq(projects.status, "published"), ne(projects.id, excludeId)),
+    )
+    .orderBy(
+      // Same-sector rows sort first; `sortOrder` keeps the admin's ordering
+      // within each group.
+      sql`case when ${projects.sectorId} is not distinct from ${sectorId} then 0 else 1 end`,
+      asc(projects.sortOrder),
+      asc(projects.id),
+    )
+    .limit(limit);
 }

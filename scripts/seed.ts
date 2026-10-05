@@ -299,7 +299,12 @@ const PROJECTS = [
     location: "Northern Province",
     summary:
       "Mobile clinics reached 640 expectant mothers with prenatal care, and trained 45 community health workers to keep that care local.",
-    body: "Working with district health offices, we equipped two mobile clinic teams and stocked them for a full year of prenatal and postnatal visits. The lasting piece is the 45 community health workers trained alongside the clinicians — they now run monthly check-ins and referrals without external staff present.",
+    body: "Working with district health offices, we equipped two mobile clinic teams and stocked them for a full year of prenatal and postnatal visits. The lasting piece is the 45 community health workers trained alongside the clinicians — they now run monthly check-ins and referrals without external staff present.\n\nThe teams travel a fixed route, so families know which week the clinic reaches their village. That predictability is what turned one-off visits into continuous care: second and third appointments now outnumber first ones.",
+    partner: "District Health Offices",
+    timeframe: "2023 — ongoing",
+    beneficiaries: "640 mothers",
+    outcomes:
+      "Two mobile clinic teams equipped and stocked for a full year\n45 community health workers trained and now working independently\nMonthly check-ins running without external staff present\nReferral times to the district hospital cut from days to hours",
     sortOrder: 1,
   },
   {
@@ -308,7 +313,12 @@ const PROJECTS = [
     location: "Rift Valley District",
     summary:
       "Rebuilt six classrooms and funded a two-year teacher training cohort, lifting completion rates for 1,100 students.",
-    body: "Six classrooms were rebuilt to withstand the rainy season, and a two-year teacher training cohort gave 38 teachers new skills in literacy instruction and inclusive classrooms. Enrolment held steady through both years instead of dipping after the harvest.",
+    body: "Six classrooms were rebuilt to withstand the rainy season, and a two-year teacher training cohort gave 38 teachers new skills in literacy instruction and inclusive classrooms. Enrolment held steady through both years instead of dipping after the harvest.\n\nRoofs and drainage came first, because a classroom that floods in May is empty by June. The training cohort followed once the buildings could be relied on.",
+    partner: "Rift Valley Education Bureau",
+    timeframe: "2022 — 2024",
+    beneficiaries: "1,100 students",
+    outcomes:
+      "Six classrooms rebuilt to withstand the rainy season\n38 teachers through a two-year training cohort\nEnrolment held steady through both harvest seasons\nCompletion rates up for 1,100 students",
     sortOrder: 2,
   },
   {
@@ -317,7 +327,12 @@ const PROJECTS = [
     location: "Coastal Region",
     summary:
       "Seeded 12 cooperatives with starter tools and market access training, supporting 480 households through their first year.",
-    body: "Twelve cooperatives received starter tools, a small operating grant, and six months of market access coaching. All twelve were trading independently at the end of the year, with 480 households reporting steadier income across the dry season.",
+    body: "Twelve cooperatives received starter tools, a small operating grant, and six months of market access coaching. All twelve were trading independently at the end of the year, with 480 households reporting steadier income across the dry season.\n\nThe coaching mattered more than the grant. Groups that had never negotiated with a buyer now set prices together, which is what held incomes up once our funding ended.",
+    partner: "Coastal Cooperative Union",
+    timeframe: "2024 — ongoing",
+    beneficiaries: "480 households",
+    outcomes:
+      "12 cooperatives seeded with tools and an operating grant\nAll 12 trading independently within the first year\n480 households reporting steadier dry-season income\nSix months of market access coaching delivered",
     sortOrder: 3,
   },
 ];

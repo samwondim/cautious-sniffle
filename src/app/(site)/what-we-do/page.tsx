@@ -39,10 +39,16 @@ export default async function WhatWeDoPage() {
 
       <PageCta
         seamSide="right"
-        title="Projects in every one of these sectors"
+        title={
+          content["sectors.ctaTitle"] ||
+          "Projects in every one of these sectors"
+        }
         body={content["work.subtitle"]}
-        primary={{ label: "See our work", href: "/work" }}
-        secondary={{ label: "Get involved", href: "/#volunteer" }}
+        primary={{ label: content["nav.work"] || "Our Work", href: "/work" }}
+        secondary={{
+          label: content["volunteer.eyebrow"] || "Get Involved",
+          href: "/#volunteer",
+        }}
       />
     </>
   );

@@ -43,6 +43,13 @@
       "when": 1791232013041,
       "tag": "0005_familiar_gwen_stacy",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791237547674,
+      "tag": "0006_youthful_scarecrow",
+      "breakpoints": true
     }
   ]
 }

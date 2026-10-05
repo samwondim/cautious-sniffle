@@ -4,7 +4,14 @@ import { getSiteContent } from "@/lib/content";
 
 export const metadata = { title: "Site content — Admin" };
 
-type SettingField = { key: string; label: string; long?: boolean };
+type SettingField = {
+  key: string;
+  label: string;
+  long?: boolean;
+  /** Renders the media picker instead of a text box. */
+  image?: boolean;
+  hint?: string;
+};
 type Group = { title: string; fields: SettingField[] };
 
 /** Mirrors the keys in `SETTING_DEFAULTS` (`src/lib/content.ts`). */
@@ -38,6 +45,37 @@ const GROUPS: Group[] = [
       { key: "hero.primaryHref", label: "Primary button link" },
       { key: "hero.secondaryLabel", label: "Secondary button label" },
       { key: "hero.secondaryHref", label: "Secondary button link" },
+      {
+        key: "hero.backdropImage",
+        label: "Background photograph",
+        image: true,
+        hint: "Sits under a dark scrim. Leave empty for the placeholder.",
+      },
+      {
+        key: "hero.tile1Image",
+        label: "Collage photo 1 (top left)",
+        image: true,
+      },
+      {
+        key: "hero.tile2Image",
+        label: "Collage photo 2 (top right)",
+        image: true,
+      },
+      {
+        key: "hero.tile3Image",
+        label: "Collage photo 3 (centre)",
+        image: true,
+      },
+      {
+        key: "hero.tile4Image",
+        label: "Collage photo 4 (lower left)",
+        image: true,
+      },
+      {
+        key: "hero.tile5Image",
+        label: "Collage photo 5 (lower right)",
+        image: true,
+      },
     ],
   },
   {
@@ -45,6 +83,8 @@ const GROUPS: Group[] = [
     fields: [
       { key: "sectors.eyebrow", label: "Eyebrow" },
       { key: "sectors.title", label: "Title" },
+      { key: "sectors.moreLabel", label: "Home link label" },
+      { key: "sectors.ctaTitle", label: "Closing banner title (sector page)" },
     ],
   },
   {
@@ -57,6 +97,9 @@ const GROUPS: Group[] = [
       { key: "mission.missionBody", label: "Mission body", long: true },
       { key: "mission.visionTitle", label: "Vision heading" },
       { key: "mission.visionBody", label: "Vision body", long: true },
+      { key: "mission.ctaTitle", label: "Closing banner title (about page)" },
+      { key: "mission.photo", label: "Portrait photograph", image: true },
+      { key: "mission.photoCaption", label: "Portrait alt text" },
     ],
   },
   {
@@ -65,6 +108,9 @@ const GROUPS: Group[] = [
       { key: "work.eyebrow", label: "Eyebrow" },
       { key: "work.title", label: "Title" },
       { key: "work.subtitle", label: "Subtitle", long: true },
+      { key: "work.moreLabel", label: "Home link label" },
+      { key: "work.supportLabel", label: "Home support link label" },
+      { key: "work.ctaTitle", label: "Closing banner title (work page)" },
     ],
   },
   {
@@ -75,6 +121,9 @@ const GROUPS: Group[] = [
       { key: "give.body", label: "Body", long: true },
       { key: "give.ctaLabel", label: "Button label" },
       { key: "give.ctaHref", label: "Button link" },
+      { key: "give.detailsLabel", label: "Bank details link label" },
+      { key: "give.photo", label: "Photograph", image: true },
+      { key: "give.photoCaption", label: "Photograph alt text" },
     ],
   },
   {
@@ -88,6 +137,12 @@ const GROUPS: Group[] = [
       { key: "volunteer.ctaLabel", label: "Button label" },
       { key: "volunteer.ctaHref", label: "Button link" },
       { key: "volunteer.buttonLabel", label: "Form submit label" },
+      {
+        key: "volunteer.backdropImage",
+        label: "Background photograph",
+        image: true,
+        hint: "Rendered in black and white behind the sign-up card.",
+      },
     ],
   },
   {
@@ -99,6 +154,16 @@ const GROUPS: Group[] = [
       { key: "social.emailHref", label: "Email link" },
       { key: "social.websiteHref", label: "Website link" },
       { key: "social.communityHref", label: "Community link" },
+    ],
+  },
+  {
+    title: "Gallery",
+    fields: [
+      { key: "gallery.eyebrow", label: "Eyebrow" },
+      { key: "gallery.title", label: "Title" },
+      { key: "gallery.subtitle", label: "Subtitle", long: true },
+      { key: "gallery.moreLabel", label: "Home link label" },
+      { key: "gallery.ctaTitle", label: "Closing banner title (gallery page)" },
     ],
   },
   {
@@ -144,16 +209,18 @@ export default async function AdminContentPage() {
       <div>
         <h1 className="font-display text-3xl text-ink">Site content</h1>
         <p className="mt-1 text-sm text-slate">
-          Every label, heading, and paragraph on the public site. Saving
-          publishes immediately.
+          Every label, heading, paragraph, and background photograph on the
+          public site. Image slots left empty fall back to the designed
+          placeholder photography. Saving publishes immediately.
         </p>
       </div>
       {GROUPS.map((group) => {
         const fields: FieldDef[] = group.fields.map((f) => ({
           name: `setting.${f.key}`,
           label: f.label,
-          type: f.long ? "textarea" : "text",
+          type: f.image ? "media" : f.long ? "textarea" : "text",
           rows: 2,
+          hint: f.hint,
         }));
         const values: Record<string, string> = {};
         for (const f of group.fields) {

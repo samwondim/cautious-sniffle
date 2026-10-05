@@ -2,12 +2,8 @@ import * as motion from "motion/react-client";
 import Link from "next/link";
 
 import { Icon, toIconName } from "@/components/icons";
-import {
-  Eyebrow,
-  PlaceholderPhoto,
-  Section,
-  SectionTitle,
-} from "@/components/section";
+import { ManagedImage } from "@/components/managed-image";
+import { Eyebrow, Section, SectionTitle } from "@/components/section";
 import type { GivingOption } from "@/db/schema";
 import type { SiteContent } from "@/lib/content";
 import { fadeIn, reveal } from "@/lib/motion";
@@ -91,7 +87,7 @@ export function Give({
             href="/donate"
             className="inline-flex w-fit items-center gap-2 text-sm font-semibold text-accent transition-opacity hover:opacity-65"
           >
-            See bank transfer details
+            {content["give.detailsLabel"] || "See bank transfer details"}
             <Icon name="arrow-right" size={16} />
           </Link>
         </motion.div>
@@ -109,12 +105,13 @@ export function Give({
             style={{ background: "rgba(62,172,180,0.12)" }}
           />
           <div className="absolute top-[30px] right-0 h-[460px] w-[420px]">
-            <PlaceholderPhoto
-              seed="eh-give-at-work"
+            <ManagedImage
+              value={content["give.photo"]}
               alt={content["give.photoCaption"] || ""}
               sizes="420px"
-              width={840}
-              height={920}
+              placeholderSeed="eh-give-at-work"
+              placeholderWidth={840}
+              placeholderHeight={920}
               className="h-full w-full rounded-[20px] border border-hairline-strong"
             />
           </div>

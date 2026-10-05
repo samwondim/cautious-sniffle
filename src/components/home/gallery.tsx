@@ -90,7 +90,7 @@ export function Gallery({
           href="/gallery"
           className="inline-flex items-center gap-2 text-sm font-semibold text-accent transition-opacity hover:opacity-65"
         >
-          View the full gallery
+          {content["gallery.moreLabel"] || "View the full gallery"}
           <Icon name="arrow-right" size={16} />
         </Link>
       </motion.div>

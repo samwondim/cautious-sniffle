@@ -204,6 +204,10 @@ export async function upsertProjectAction(
     summary: formString(formData, "summary"),
     body: formString(formData, "body"),
     imageUrl: formString(formData, "imageUrl"),
+    partner: formString(formData, "partner"),
+    timeframe: formString(formData, "timeframe"),
+    beneficiaries: formString(formData, "beneficiaries"),
+    outcomes: formString(formData, "outcomes"),
     sortOrder: formString(formData, "sortOrder") || "0",
     status: formString(formData, "status") || "draft",
   });

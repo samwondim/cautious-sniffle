@@ -65,7 +65,10 @@ export function ProjectGrid({
           className="flex flex-col overflow-hidden rounded-2xl border border-hairline bg-white"
           style={{ boxShadow: "0 12px 28px rgba(16,60,70,0.08)" }}
         >
-          <ProjectImage project={project} priority={priorityFirst && index === 0} />
+          <ProjectImage
+            project={project}
+            priority={priorityFirst && index === 0}
+          />
 
           <div className="flex flex-col gap-3.5 p-6">
             {project.sectorName ? (
@@ -136,14 +139,14 @@ export function Work({
           href="/work"
           className="inline-flex items-center gap-2 text-sm font-semibold text-accent transition-opacity hover:opacity-65"
         >
-          See all projects
+          {content["work.moreLabel"] || "See all projects"}
           <Icon name="arrow-right" size={16} />
         </Link>
         <Link
           href="/donate"
           className="inline-flex items-center gap-2 text-sm font-semibold text-accent transition-opacity hover:opacity-65"
         >
-          Support this work
+          {content["work.supportLabel"] || "Support this work"}
           <Icon name="arrow-right" size={16} />
         </Link>
       </motion.div>

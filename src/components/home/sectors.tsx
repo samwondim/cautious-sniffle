@@ -65,7 +65,7 @@ export function Sectors({
           href="/what-we-do"
           className="inline-flex items-center gap-2 text-sm font-semibold text-accent transition-opacity hover:opacity-65"
         >
-          How we work in each sector
+          {content["sectors.moreLabel"] || "How we work in each sector"}
           <Icon name="arrow-right" size={16} />
         </Link>
       </motion.div>
