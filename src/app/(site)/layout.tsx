@@ -24,11 +24,13 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
         <style>{`[data-reveal]{opacity:1!important;transform:none!important}[data-countup]{visibility:visible!important}`}</style>
       </noscript>
 
-      <SiteNav content={content} />
+      {/* Wraps the header too: the mobile menu animates, and it must honour
+          the Reduced Motion setting like everything else. */}
       <MotionProvider>
+        <SiteNav content={content} />
         <main className="flex-1">{children}</main>
+        <SiteFooter content={content} />
       </MotionProvider>
-      <SiteFooter content={content} />
     </div>
   );
 }

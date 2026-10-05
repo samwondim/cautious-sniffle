@@ -11,7 +11,7 @@
  */
 
 /** Expo-out. Reads as a settle rather than a slide. */
-const REVEAL_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+export const REVEAL_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 const REVEAL_DURATION = 0.5;
 
