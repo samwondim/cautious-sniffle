@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { StatValue } from "@/components/home/stat-value";
 import { Icon, Squiggle, toIconName } from "@/components/icons";
 import type { ImpactStat } from "@/db/schema";
 import type { SiteContent } from "@/lib/content";
@@ -233,7 +234,7 @@ export function Hero({
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[16px] font-semibold text-ink md:text-stat">
-                    {stat.value} {stat.label}
+                    <StatValue value={stat.value} /> {stat.label}
                   </span>
                   <span className="hidden text-[13px] text-slate sm:block">
                     {stat.detail}

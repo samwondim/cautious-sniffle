@@ -1,9 +1,57 @@
+import * as motion from "motion/react-client";
 import Link from "next/link";
 
 import { Icon, toIconName } from "@/components/icons";
-import { Eyebrow, PlaceholderPhoto, Section, SectionTitle } from "@/components/section";
+import {
+  Eyebrow,
+  PlaceholderPhoto,
+  Section,
+  SectionTitle,
+} from "@/components/section";
 import type { GivingOption } from "@/db/schema";
 import type { SiteContent } from "@/lib/content";
+import { fadeIn, reveal } from "@/lib/motion";
+
+/**
+ * The icon-and-text giving rows of the "Ways to Give" band.
+ */
+export function GivingOptionList({ options }: { options: GivingOption[] }) {
+  return (
+    <div className="flex flex-col gap-5">
+      {options.map((option, index) => (
+        <motion.div
+          key={option.id}
+          {...reveal({ index, distance: 16 })}
+          className="flex items-start gap-4"
+        >
+          <div
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+            style={{
+              background:
+                option.icon === "building"
+                  ? "rgba(59,152,97,0.12)"
+                  : "rgba(62,172,180,0.14)",
+            }}
+          >
+            <Icon
+              name={toIconName(option.icon)}
+              size={20}
+              className={
+                option.icon === "building" ? "text-growth" : "text-accent"
+              }
+            />
+          </div>
+          <div className="flex flex-col gap-1">
+            <h3 className="text-base font-semibold text-ink">{option.title}</h3>
+            <p className="max-w-[420px] text-sm leading-[1.55] text-slate">
+              {option.description}
+            </p>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
 
 /** "Ways to Give" — giving options beside a photo slot. */
 export function Give({
@@ -16,7 +64,7 @@ export function Give({
   return (
     <Section id="give" className="lg:py-28">
       <div className="flex flex-col items-center gap-12 lg:flex-row lg:gap-18">
-        <div className="flex flex-1 flex-col gap-6">
+        <motion.div {...reveal()} className="flex flex-1 flex-col gap-6">
           <Eyebrow>{content["give.eyebrow"]}</Eyebrow>
           <SectionTitle size="lg">{content["give.title"]}</SectionTitle>
 
@@ -26,34 +74,8 @@ export function Give({
             </p>
           ) : null}
 
-          <div className="mt-1 flex flex-col gap-5">
-            {options.map((option) => (
-              <div key={option.id} className="flex items-start gap-4">
-                <div
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
-                  style={{
-                    background:
-                      option.icon === "building"
-                        ? "rgba(59,152,97,0.12)"
-                        : "rgba(62,172,180,0.14)",
-                  }}
-                >
-                  <Icon
-                    name={toIconName(option.icon)}
-                    size={20}
-                    className={option.icon === "building" ? "text-growth" : "text-accent"}
-                  />
-                </div>
-                <div className="flex flex-col gap-1">
-                  <h3 className="text-base font-semibold text-ink">
-                    {option.title}
-                  </h3>
-                  <p className="max-w-[420px] text-sm leading-[1.55] text-slate">
-                    {option.description}
-                  </p>
-                </div>
-              </div>
-            ))}
+          <div className="mt-1">
+            <GivingOptionList options={options} />
           </div>
 
           {content["give.ctaLabel"] ? (
@@ -64,9 +86,20 @@ export function Give({
               {content["give.ctaLabel"]}
             </Link>
           ) : null}
-        </div>
 
-        <div className="relative hidden h-[520px] w-[480px] shrink-0 lg:block">
+          <Link
+            href="/donate"
+            className="inline-flex w-fit items-center gap-2 text-sm font-semibold text-accent transition-opacity hover:opacity-65"
+          >
+            See bank transfer details
+            <Icon name="arrow-right" size={16} />
+          </Link>
+        </motion.div>
+
+        <motion.div
+          {...fadeIn({ amount: 0.2 })}
+          className="relative hidden h-[520px] w-[480px] shrink-0 lg:block"
+        >
           <div
             className="absolute top-0 left-0 h-[280px] w-[280px] rounded-full"
             style={{ background: "rgba(59,152,97,0.12)" }}
@@ -85,7 +118,7 @@ export function Give({
               className="h-full w-full rounded-[20px] border border-hairline-strong"
             />
           </div>
-        </div>
+        </motion.div>
       </div>
     </Section>
   );

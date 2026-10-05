@@ -1,10 +1,13 @@
+import * as motion from "motion/react-client";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BandSeam } from "@/components/band-seam";
 import { Icon } from "@/components/icons";
 import { ManagedImage } from "@/components/managed-image";
 import { Section } from "@/components/section";
 import { getPublishedProject, getSiteContent } from "@/lib/content";
+import { fadeIn, reveal } from "@/lib/motion";
 
 /** Ids are the primary key, so anything non-numeric is a 404, not a lookup. */
 function parseId(raw: string): number | null {
@@ -80,12 +83,20 @@ export default async function ProjectPage({
             />
           </div>
 
-          <p className="text-[19px] leading-[1.6] font-medium text-ink">
+          <motion.p
+            {...reveal({ distance: 12, amount: 0.6 })}
+            className="text-[19px] leading-[1.6] font-medium text-ink"
+          >
             {project.summary}
-          </p>
+          </motion.p>
 
           {project.body ? (
-            <div className="flex flex-col gap-5">
+            // One reveal for the whole body, not one per paragraph: long-form
+            // copy that keeps arriving late fights the reader's own pace.
+            <motion.div
+              {...reveal({ distance: 16, amount: 0.15 })}
+              className="flex flex-col gap-5"
+            >
               {project.body
                 .split(/\n{2,}/)
                 .map((paragraph) => paragraph.trim())
@@ -98,10 +109,13 @@ export default async function ProjectPage({
                     {paragraph}
                   </p>
                 ))}
-            </div>
+            </motion.div>
           ) : null}
 
-          <div className="flex flex-wrap items-center gap-4 border-t border-hairline pt-8">
+          <motion.div
+            {...fadeIn({ amount: 0.8 })}
+            className="flex flex-wrap items-center gap-4 border-t border-hairline pt-8"
+          >
             <Link
               href="/donate"
               className="bg-gold px-8 py-4 text-sm font-semibold tracking-[0.04em] text-ink transition-colors hover:bg-olive hover:text-white"
@@ -115,9 +129,11 @@ export default async function ProjectPage({
               See other projects
               <Icon name="arrow-right" size={16} />
             </Link>
-          </div>
+          </motion.div>
         </div>
       </Section>
+
+      <BandSeam from="white" to="ink-deep" side="left" />
     </>
   );
 }

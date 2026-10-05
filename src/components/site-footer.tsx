@@ -3,13 +3,7 @@ import Link from "next/link";
 
 import { Icon, type IconName } from "@/components/icons";
 import type { SiteContent } from "@/lib/content";
-
-const EXPLORE = [
-  { key: "nav.mission", href: "/#mission" },
-  { key: "nav.sectors", href: "/#what-we-do" },
-  { key: "nav.work", href: "/#work" },
-  { key: "nav.contact", href: "/#contact" },
-] as const;
+import { FOOTER_NAV } from "@/lib/navigation";
 
 const SOCIALS: readonly {
   key: keyof SiteContent;
@@ -69,13 +63,13 @@ export function SiteFooter({ content }: { content: SiteContent }) {
             <span className="text-xs font-semibold tracking-[0.1em] text-sage uppercase">
               Explore
             </span>
-            {EXPLORE.map((item) => (
+            {FOOTER_NAV.map((item) => (
               <Link
-                key={item.key}
+                key={item.href}
                 href={item.href}
                 className="text-sm text-white transition-colors hover:text-gold"
               >
-                {content[item.key]}
+                {content[item.key] || item.fallback}
               </Link>
             ))}
             <Link
@@ -119,12 +113,6 @@ export function SiteFooter({ content }: { content: SiteContent }) {
 
         <div className="mt-16 flex items-center justify-between border-t border-white/15 pt-6">
           <span className="text-[13px] text-sage">{content["footer.copyright"]}</span>
-          <Link
-            href="/admin"
-            className="text-[13px] text-sage transition-colors hover:text-white"
-          >
-            Admin
-          </Link>
         </div>
       </div>
     </footer>

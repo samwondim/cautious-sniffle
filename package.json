@@ -22,6 +22,7 @@
     "@neon/env": "^1.5.0",
     "@node-rs/argon2": "^2.2.1",
     "drizzle-orm": "^0.45.3",
+    "motion": "^14.0.0",
     "next": "16.3.6",
     "postgres": "^3.4.9",
     "react": "19.2.8",

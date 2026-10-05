@@ -1,3 +1,4 @@
+import { MotionProvider } from "@/components/motion/motion-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
 import { getAccent, getSiteContent } from "@/lib/content";
@@ -16,8 +17,17 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
       style={{ "--accent": accent } as React.CSSProperties}
       className="flex min-h-full flex-1 flex-col"
     >
+      {/* Scroll reveals ship their `initial` state as an inline `opacity: 0`,
+          so without JavaScript the bands would never appear. Only
+          `!important` beats an inline style. */}
+      <noscript>
+        <style>{`[data-reveal]{opacity:1!important;transform:none!important}[data-countup]{visibility:visible!important}`}</style>
+      </noscript>
+
       <SiteNav content={content} />
-      <main className="flex-1">{children}</main>
+      <MotionProvider>
+        <main className="flex-1">{children}</main>
+      </MotionProvider>
       <SiteFooter content={content} />
     </div>
   );
