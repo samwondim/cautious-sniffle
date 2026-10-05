@@ -61,12 +61,15 @@ export default async function AdminHomePage() {
     db
       .select()
       .from(donations)
-      .orderBy(desc(donations.createdAt))
+      // `created_at` ties are common (the seed writes a batch in one
+      // transaction), and without a unique tiebreaker Postgres is free to
+      // return them in any order — so the list reshuffled between requests.
+      .orderBy(desc(donations.createdAt), desc(donations.id))
       .limit(5),
     db
       .select()
       .from(volunteers)
-      .orderBy(desc(volunteers.createdAt))
+      .orderBy(desc(volunteers.createdAt), desc(volunteers.id))
       .limit(5),
   ]);
 
@@ -116,8 +119,14 @@ export default async function AdminHomePage() {
         ))}
       </div>
 
+      {/*
+        `min-w-0` on the grid items is load-bearing: a grid item's default
+        `min-width: auto` is its min-content width, so one long donor name
+        widened the shared column past the viewport and the page scrolled
+        sideways. Both items need it — they size the same column.
+      */}
       <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-2xl border border-hairline bg-white p-6">
+        <section className="min-w-0 rounded-2xl border border-hairline bg-white p-6">
           <h2 className="font-display text-xl text-ink">Recent donations</h2>
           <ul className="mt-4 flex flex-col gap-3">
             {recentDonations.length === 0 ? (
@@ -128,7 +137,7 @@ export default async function AdminHomePage() {
                   key={d.id}
                   className="flex items-center justify-between gap-3 text-sm"
                 >
-                  <span className="truncate text-ink">
+                  <span className="min-w-0 truncate text-ink">
                     {d.donorName}{" "}
                     <span className="text-slate">
                       · {(d.amountCents / 100).toFixed(2)} {d.currency}
@@ -143,7 +152,7 @@ export default async function AdminHomePage() {
           </ul>
         </section>
 
-        <section className="rounded-2xl border border-hairline bg-white p-6">
+        <section className="min-w-0 rounded-2xl border border-hairline bg-white p-6">
           <h2 className="font-display text-xl text-ink">Recent volunteers</h2>
           <ul className="mt-4 flex flex-col gap-3">
             {recentVolunteers.length === 0 ? (
@@ -154,7 +163,7 @@ export default async function AdminHomePage() {
                   key={v.id}
                   className="flex items-center justify-between gap-3 text-sm"
                 >
-                  <span className="truncate text-ink">
+                  <span className="min-w-0 truncate text-ink">
                     {v.name} <span className="text-slate">· {v.interest}</span>
                   </span>
                   <span className="shrink-0 rounded-full bg-mint px-2.5 py-1 text-xs font-semibold text-accent">

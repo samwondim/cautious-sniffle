@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
+import { MediaField } from "@/components/admin/media-field";
 import type { AdminActionState } from "@/lib/admin";
 import { ADMIN_IDLE } from "@/lib/admin";
 
@@ -37,15 +38,17 @@ export function AdminField({
   error,
   children,
   hint,
+  className = "",
 }: {
   label: string;
   name: string;
   error?: string;
   children: React.ReactNode;
   hint?: string;
+  className?: string;
 }) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className={`flex flex-col gap-1.5 ${className}`}>
       <label htmlFor={name} className="field-label">
         {label}
       </label>
@@ -72,10 +75,12 @@ export function AdminSubmit({ label }: { label: string }) {
 export type FieldDef = {
   name: string;
   label: string;
-  type: "text" | "number" | "textarea" | "select" | "color";
+  type: "text" | "number" | "textarea" | "select" | "color" | "media";
   options?: readonly string[] | { value: string; label: string }[];
   rows?: number;
   hint?: string;
+  /** `media` only: spans both columns, since a thumbnail reads badly in half. */
+  fullWidth?: boolean;
 };
 
 /**
@@ -113,8 +118,15 @@ export function AdminForm({
               name={field.name}
               error={error}
               hint={field.hint}
+              className={
+                field.type === "media" || field.fullWidth
+                  ? "md:col-span-2"
+                  : undefined
+              }
             >
-              {field.type === "textarea" ? (
+              {field.type === "media" ? (
+                <MediaField name={field.name} defaultValue={value} />
+              ) : field.type === "textarea" ? (
                 <textarea
                   id={field.name}
                   name={field.name}

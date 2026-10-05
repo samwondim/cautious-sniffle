@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { Icon } from "@/components/icons";
-import { Eyebrow, PlaceholderPhoto, Section, SectionTitle } from "@/components/section";
+import { ManagedImage } from "@/components/managed-image";
+import { Eyebrow, Section, SectionTitle } from "@/components/section";
 import type { SiteContent } from "@/lib/content";
 
 export type ProjectCard = {
@@ -17,30 +18,18 @@ export type ProjectCard = {
 const CARD_SIZES = "(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw";
 
 function ProjectImage({ project }: { project: ProjectCard }) {
-  if (project.imageUrl) {
-    return (
-      // Admin-supplied URL: not optimizable at build time, so a plain
-      // <img> avoids next/image's static allowlist entirely.
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={project.imageUrl}
-        alt={`${project.title} — ${project.location}`}
-        className="h-[210px] w-full object-cover"
-        loading="lazy"
-      />
-    );
-  }
-  // No photograph uploaded yet — stand in with a stable seeded placeholder so
-  // the card still reads as a card. Seeded by id: the same project keeps the
-  // same photo across requests.
+  // `ManagedImage` picks the right treatment for whatever `imageUrl` holds —
+  // a media-library key, a pasted external URL, or nothing at all, in which
+  // case a placeholder seeded by id keeps the same stand-in across requests.
   return (
-    <PlaceholderPhoto
-      seed={`eh-project-${project.id}`}
+    <ManagedImage
+      value={project.imageUrl}
       alt={`${project.title} — ${project.location}`}
       sizes={CARD_SIZES}
-      width={800}
-      height={420}
       className="h-[210px] w-full"
+      placeholderSeed={`eh-project-${project.id}`}
+      placeholderWidth={800}
+      placeholderHeight={420}
     />
   );
 }
