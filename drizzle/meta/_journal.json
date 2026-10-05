@@ -29,6 +29,20 @@
       "when": 1791017717226,
       "tag": "0003_elite_moon_knight",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791216127681,
+      "tag": "0004_lonely_quicksilver",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791232013041,
+      "tag": "0005_familiar_gwen_stacy",
+      "breakpoints": true
     }
   ]
 }

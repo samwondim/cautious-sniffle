@@ -3,7 +3,6 @@
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { z } from "zod";
 
 import { db } from "@/db";
 import {
@@ -21,6 +20,7 @@ import {
 } from "@/db/schema";
 import {
   accountSchema,
+  gallerySchema,
   givingSchema,
   projectSchema,
   sectorSchema,
@@ -28,33 +28,21 @@ import {
   themeSchema,
   type AdminActionState,
 } from "@/lib/admin";
-import { getSession, loginAdmin, logoutAdmin } from "@/lib/auth";
+import {
+  ERROR,
+  authed,
+  formString,
+  revalidateSite,
+} from "@/lib/admin-actions";
+import { loginAdmin, logoutAdmin } from "@/lib/auth";
 import { fieldErrorsFrom } from "@/lib/forms";
 
 /**
- * Admin Server Actions. Every mutation re-checks the session — the layout
- * guard alone is not enough, since actions are reachable by direct POST.
+ * Admin Server Actions. Every mutation re-checks the session via `authed()` —
+ * the layout guard alone is not enough, since actions are reachable by direct
+ * POST. Shared helpers live in `src/lib/admin-actions.ts`, because a
+ * `"use server"` module may only export Server Actions.
  */
-
-async function authed() {
-  const session = await getSession();
-  if (!session) redirect("/admin/login");
-  return session;
-}
-
-function formString(formData: FormData, key: string): string {
-  const value = formData.get(key);
-  return typeof value === "string" ? value : "";
-}
-
-const ERROR: AdminActionState = {
-  status: "error",
-  message: "Something went wrong. Please try again.",
-};
-
-function revalidateSite() {
-  revalidatePath("/", "layout");
-}
 
 /* -------------------------------------------------------------------------- */
 /* Auth                                                                       */
@@ -424,13 +412,7 @@ export async function upsertGalleryAction(
 ): Promise<AdminActionState> {
   await authed();
   const id = formString(formData, "id");
-  const parsed = z.object({
-    title: z.string().trim().min(1, "Required.").max(200),
-    caption: z.string().trim().max(2000).optional().transform((v) => (v ? v : null)),
-    imageUrl: z.string().trim().max(2000).optional().transform((v) => (v ? v : null)),
-    sortOrder: z.coerce.number().int().default(0),
-    status: z.enum(["draft", "published"]).default("draft"),
-  }).safeParse({
+  const parsed = gallerySchema.safeParse({
     title: formString(formData, "title"),
     caption: formString(formData, "caption"),
     imageUrl: formString(formData, "imageUrl"),

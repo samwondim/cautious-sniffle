@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+  customType,
   index,
   integer,
   pgEnum,
@@ -8,6 +9,16 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+
+/**
+ * Postgres `bytea`. Drizzle has no built-in for it; the `postgres` driver
+ * reads and writes these columns as Node Buffers.
+ */
+const bytea = customType<{ data: Buffer; driverData: Buffer }>({
+  dataType() {
+    return "bytea";
+  },
+});
 
 /* -------------------------------------------------------------------------- */
 /* Enums                                                                      */
@@ -208,6 +219,50 @@ export const galleryImages = pgTable(
   (table) => [index("gallery_images_sort_order_idx").on(table.sortOrder)],
 );
 
+export const mediaAssets = pgTable(
+  "media_assets",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    originalFilename: varchar("original_filename", { length: 255 }).notNull(),
+    contentType: varchar("content_type", { length: 100 }).notNull(),
+    byteSize: integer("byte_size").notNull(),
+    /**
+     * Intrinsic pixel size, measured in the browser before upload. Nullable
+     * and advisory: every render site uses `next/image` with `fill`, so these
+     * only drive the library grid's own layout.
+     */
+    width: integer("width"),
+    height: integer("height"),
+    altText: varchar("alt_text", { length: 300 }).notNull().default(""),
+    uploadedBy: integer("uploaded_by").references(() => admins.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [index("media_assets_created_at_idx").on(table.createdAt)],
+);
+
+/**
+ * Image bytes, deliberately in their own table.
+ *
+ * Keeping them out of `media_assets` means a listing query can never
+ * accidentally drag megabytes of image data back with it — `select()` on the
+ * metadata table is safe by construction. The cascade also makes deletion
+ * atomic: there is no second system to fall out of step with, so an asset
+ * row and its bytes cannot outlive each other.
+ */
+export const mediaBlobs = pgTable("media_blobs", {
+  mediaAssetId: integer("media_asset_id")
+    .primaryKey()
+    .references(() => mediaAssets.id, { onDelete: "cascade" }),
+  data: bytea("data").notNull(),
+});
+
 /* -------------------------------------------------------------------------- */
 /* Submissions                                                                */
 /* -------------------------------------------------------------------------- */
@@ -330,6 +385,8 @@ export type ImpactStat = typeof impactStats.$inferSelect;
 export type Project = typeof projects.$inferSelect;
 export type GivingOption = typeof givingOptions.$inferSelect;
 export type GalleryImage = typeof galleryImages.$inferSelect;
+export type MediaAsset = typeof mediaAssets.$inferSelect;
+export type MediaBlob = typeof mediaBlobs.$inferSelect;
 export type Donation = typeof donations.$inferSelect;
 export type Volunteer = typeof volunteers.$inferSelect;
 export type Message = typeof messages.$inferSelect;

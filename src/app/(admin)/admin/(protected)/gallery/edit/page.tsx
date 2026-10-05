@@ -1,14 +1,14 @@
 import Link from "next/link";
-import { asc, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
-import { upsertProjectAction } from "@/app/actions/admin";
+import { upsertGalleryAction } from "@/app/actions/admin";
 import { AdminForm } from "@/components/admin/ui";
 import { db } from "@/db";
-import { projects, sectors } from "@/db/schema";
+import { galleryImages } from "@/db/schema";
 
-export const metadata = { title: "Edit project — Admin" };
+export const metadata = { title: "Edit gallery image — Admin" };
 
-export default async function AdminProjectEditPage({
+export default async function AdminGalleryEditPage({
   searchParams,
 }: {
   searchParams: Promise<{ id?: string }>;
@@ -16,25 +16,17 @@ export default async function AdminProjectEditPage({
   const { id } = await searchParams;
   const recordId = id ? Number(id) : undefined;
 
-  const allSectors = await db
-    .select({ id: sectors.id, name: sectors.name })
-    .from(sectors)
-    .orderBy(asc(sectors.sortOrder), asc(sectors.id));
-
   let values: Record<string, string | number | null | undefined> | undefined;
   if (recordId && Number.isFinite(recordId)) {
     const [row] = await db
       .select()
-      .from(projects)
-      .where(eq(projects.id, recordId))
+      .from(galleryImages)
+      .where(eq(galleryImages.id, recordId))
       .limit(1);
     if (row) {
       values = {
         title: row.title,
-        location: row.location,
-        sectorId: row.sectorId === null ? "none" : row.sectorId,
-        summary: row.summary,
-        body: row.body,
+        caption: row.caption,
         imageUrl: row.imageUrl,
         sortOrder: row.sortOrder,
         status: row.status,
@@ -45,37 +37,23 @@ export default async function AdminProjectEditPage({
   return (
     <div className="flex flex-col gap-6">
       <Link
-        href="/admin/projects"
+        href="/admin/gallery"
         className="w-fit text-sm font-semibold text-accent hover:opacity-70"
       >
-        ← Back to projects
+        ← Back to gallery
       </Link>
       <h1 className="font-display text-3xl text-ink">
-        {values ? "Edit project" : "New project"}
+        {values ? "Edit gallery image" : "New gallery image"}
       </h1>
-      <section className="rounded-2xl border border-hairline bg-white p-6">
+      <section className="rounded-2xl border border-hairline bg-white p-4 sm:p-6">
         <AdminForm
-          action={upsertProjectAction}
+          action={upsertGalleryAction}
           recordId={values ? recordId : undefined}
-          submitLabel={values ? "Save project" : "Create project"}
+          submitLabel={values ? "Save image" : "Create image"}
           values={values}
           fields={[
             { name: "title", label: "Title", type: "text" },
-            { name: "location", label: "Location", type: "text" },
-            {
-              name: "sectorId",
-              label: "Sector",
-              type: "select",
-              options: [
-                { value: "none", label: "No sector" },
-                ...allSectors.map((s) => ({
-                  value: String(s.id),
-                  label: s.name,
-                })),
-              ],
-            },
-            { name: "summary", label: "Summary (card)", type: "textarea" },
-            { name: "body", label: "Body (detail page)", type: "textarea", rows: 6 },
+            { name: "caption", label: "Caption", type: "textarea" },
             {
               name: "imageUrl",
               label: "Image",

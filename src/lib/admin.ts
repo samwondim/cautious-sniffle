@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { isMediaRef } from "./media-constants";
 import { fieldErrorsFrom } from "./forms";
 
 /** Zod schemas for everything the admin dashboard can write. */
@@ -7,6 +8,22 @@ import { fieldErrorsFrom } from "./forms";
 const name = z.string().trim().min(1, "Required.").max(200);
 const shortText = z.string().trim().max(200);
 const longText = z.string().trim().max(5000);
+
+/**
+ * An image reference on a content row: a media-library reference
+ * (`media:12`) or an external URL. Empty becomes null, which renders
+ * placeholder art.
+ */
+export const imageRefSchema = z
+  .string()
+  .trim()
+  .max(2000)
+  .optional()
+  .transform((v) => (v ? v : null))
+  .refine(
+    (v) => v === null || isMediaRef(v) || /^(https?:)?\/\//i.test(v),
+    "Choose an image from the library, or paste a full image URL.",
+  );
 
 export const sectorSchema = z.object({
   slug: z
@@ -33,12 +50,20 @@ export const projectSchema = z.object({
     .max(20000)
     .optional()
     .transform((v) => (v ? v : null)),
-  imageUrl: z
+  imageUrl: imageRefSchema,
+  sortOrder: z.coerce.number().int().default(0),
+  status: z.enum(["draft", "published"]).default("draft"),
+});
+
+export const gallerySchema = z.object({
+  title: z.string().trim().min(1, "Required.").max(200),
+  caption: z
     .string()
     .trim()
     .max(2000)
     .optional()
     .transform((v) => (v ? v : null)),
+  imageUrl: imageRefSchema,
   sortOrder: z.coerce.number().int().default(0),
   status: z.enum(["draft", "published"]).default("draft"),
 });
@@ -94,6 +119,21 @@ export const themeSchema = z.object({
     .string()
     .trim()
     .regex(/^#[0-9a-fA-F]{6}$/, "Must be a hex colour like #3EACB4."),
+});
+
+/* -------------------------------------------------------------------------- */
+/* Media library                                                              */
+/* -------------------------------------------------------------------------- */
+
+/** Metadata the browser reports alongside the resized image bytes. */
+export const uploadMetaSchema = z.object({
+  originalFilename: z.string().trim().min(1).max(255),
+  width: z.coerce.number().int().positive().max(100000).nullable(),
+  height: z.coerce.number().int().positive().max(100000).nullable(),
+});
+
+export const mediaAltSchema = z.object({
+  altText: z.string().trim().max(300),
 });
 
 export type AdminActionState = {

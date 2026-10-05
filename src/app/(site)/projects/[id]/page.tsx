@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Icon } from "@/components/icons";
-import { PlaceholderPhoto, Section } from "@/components/section";
+import { ManagedImage } from "@/components/managed-image";
+import { Section } from "@/components/section";
 import { getPublishedProject, getSiteContent } from "@/lib/content";
 
 /** Ids are the primary key, so anything non-numeric is a 404, not a lookup. */
@@ -67,25 +68,16 @@ export default async function ProjectPage({
       <Section className="lg:py-20">
         <div className="mx-auto flex max-w-[900px] flex-col gap-10">
           <div className="overflow-hidden rounded-2xl">
-            {project.imageUrl ? (
-              // Admin-supplied URL, so a plain <img> keeps it off next/image's
-              // static allowlist — the same trade-off the project cards make.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={project.imageUrl}
-                alt={`${project.title} — ${project.location}`}
-                className="h-[420px] w-full object-cover"
-              />
-            ) : (
-              <PlaceholderPhoto
-                seed={`eh-project-${project.id}`}
-                alt={`${project.title} — ${project.location}`}
-                sizes="(min-width: 900px) 900px, 100vw"
-                width={1800}
-                height={950}
-                className="h-[420px] w-full"
-              />
-            )}
+            <ManagedImage
+              value={project.imageUrl}
+              alt={`${project.title} — ${project.location}`}
+              sizes="(min-width: 900px) 900px, 100vw"
+              className="h-[420px] w-full"
+              placeholderSeed={`eh-project-${project.id}`}
+              placeholderWidth={1800}
+              placeholderHeight={950}
+              priority
+            />
           </div>
 
           <p className="text-[19px] leading-[1.6] font-medium text-ink">
