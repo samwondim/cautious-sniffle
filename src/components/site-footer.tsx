@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { Icon, type IconName } from "@/components/icons";
+import { CookieSettingsButton } from "@/components/cookie-settings-button";
 import type { SiteContent } from "@/lib/content";
 import { FOOTER_NAV } from "@/lib/navigation";
 
@@ -111,8 +112,23 @@ export function SiteFooter({ content }: { content: SiteContent }) {
           </div>
         </div>
 
-        <div className="mt-16 flex items-center justify-between border-t border-white/15 pt-6">
+        <div className="mt-16 flex flex-col gap-3 border-t border-white/15 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-[13px] text-sage">{content["footer.copyright"]}</span>
+          <nav aria-label="Legal" className="flex items-center gap-5">
+            <Link
+              href="/privacy"
+              className="text-[13px] text-sage transition-colors hover:text-white"
+            >
+              Privacy
+            </Link>
+            <Link
+              href="/cookies"
+              className="text-[13px] text-sage transition-colors hover:text-white"
+            >
+              Cookies
+            </Link>
+            <CookieSettingsButton />
+          </nav>
         </div>
       </div>
     </footer>
