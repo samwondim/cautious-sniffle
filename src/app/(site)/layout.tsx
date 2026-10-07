@@ -1,3 +1,4 @@
+import { CookieBanner } from "@/components/cookie-banner";
 import { MotionProvider } from "@/components/motion/motion-provider";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteNav } from "@/components/site-nav";
@@ -30,6 +31,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
         <SiteNav content={content} />
         <main className="flex-1">{children}</main>
         <SiteFooter content={content} />
+        <CookieBanner />
       </MotionProvider>
     </div>
   );
