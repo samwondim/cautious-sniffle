@@ -1,13 +1,14 @@
 /**
- * Scroll-reveal tokens for the public site.
+ * Scroll-reveal tokens for the public site, plus the hero collage entrance.
  *
  * The sections that use these stay server components: they import
  * `motion/react-client`, whose components are pre-marked client components, and
  * spread the plain objects below. Everything here must therefore stay
  * serializable — no functions, no motion values.
  *
- * Timing matches the motion vocabulary already on the page (the hero collage
- * tiles, `src/components/home/hero.tsx`): half a second, eased out.
+ * The hero collage (`src/components/home/hero-collage.tsx`) is the one
+ * client-component exception: it imports these same tokens into `motion/react`
+ * variants so the whole page shares one motion vocabulary.
  */
 
 /** Expo-out. Reads as a settle rather than a slide. */
@@ -79,3 +80,53 @@ export function fadeIn({ index = 0, amount = 0.3 }: Omit<RevealOptions, "distanc
     transition: transition(index),
   };
 }
+
+/* -------------------------------------------------------------------------- */
+/* Hero collage entrance (lively spring stagger)                              */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Shared hero tile spring: a lively settle, not a bounce. `stiffness` 260 /
+ * `damping` 26 lands in ~0.7s with a hint of overshoot on scale only.
+ */
+export const HERO_TILE_SPRING = {
+  type: "spring",
+  stiffness: 260,
+  damping: 26,
+  mass: 1,
+} as const;
+
+/** Stagger between tiles, with a beat after the copy starts to settle. */
+export const HERO_COLLAGE_STAGGER = 0.12;
+export const HERO_COLLAGE_DELAY = 0.15;
+
+/** Container variant: fades in the arc backdrop, then staggers the tiles. */
+export const HERO_COLLAGE_VARIANTS = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: HERO_COLLAGE_STAGGER,
+      delayChildren: HERO_COLLAGE_DELAY,
+    },
+  },
+} as const;
+
+/** Backdrop arc variant: a slow fade so the tiles pop against it. */
+export const HERO_ARC_VARIANTS = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { duration: 0.8, ease: REVEAL_EASE },
+  },
+} as const;
+
+/** Tile variant: fade, rise and un-scale into place. */
+export const HERO_TILE_VARIANTS = {
+  hidden: { opacity: 0, y: 28, scale: 0.94 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: HERO_TILE_SPRING,
+  },
+} as const;

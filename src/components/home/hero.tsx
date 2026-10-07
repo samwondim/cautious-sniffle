@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { HeroCollage } from "@/components/home/hero-collage";
 import { StatValue } from "@/components/home/stat-value";
 import { Icon, Squiggle, toIconName } from "@/components/icons";
 import { ManagedBackdrop } from "@/components/managed-image";
@@ -10,145 +11,14 @@ import {
   placeholderPhotoById,
 } from "@/lib/placeholder-image";
 
-/* -------------------------------------------------------------------------- */
-/* Hero collage                                                               */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Tile geometry is taken straight off the reference composition (an 838x768
- * canvas) and scaled by COLLAGE_SCALE to the 560x480 box the hero reserves.
- * Keeping the reference numbers here means the arrangement can be re-derived
- * rather than nudged by hand.
- */
-const COLLAGE_SCALE = 560 / 838;
-
-const scale = (n: number) => Math.round(n * COLLAGE_SCALE);
-
-type TileSpec = {
-  /** Position and size on the reference canvas, before scaling. */
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-  /**
-   * Pinned picsum id. Seeds would give an arbitrary subject — a bridge, a
-   * skyline — where this collage needs people, so each tile names its photo.
-   */
-  photoId: number;
-  /** The centre tile overlaps the four around it. */
-  z: number;
-  /** `site_content` key the admin can point at its own photograph. */
-  contentKey: string;
-};
-
-const TILES: TileSpec[] = [
-  {
-    x: 133,
-    y: 40,
-    w: 277,
-    h: 285,
-    photoId: 646,
-    z: 2,
-    contentKey: "hero.tile1Image",
-  },
-  {
-    x: 485,
-    y: 65,
-    w: 235,
-    h: 250,
-    photoId: 129,
-    z: 2,
-    contentKey: "hero.tile2Image",
-  },
-  {
-    x: 296,
-    y: 196,
-    w: 296,
-    h: 297,
-    photoId: 64,
-    z: 3,
-    contentKey: "hero.tile3Image",
-  },
-  {
-    x: 175,
-    y: 380,
-    w: 235,
-    h: 245,
-    photoId: 65,
-    z: 1,
-    contentKey: "hero.tile4Image",
-  },
-  {
-    x: 490,
-    y: 395,
-    w: 260,
-    h: 270,
-    photoId: 342,
-    z: 1,
-    contentKey: "hero.tile5Image",
-  },
-];
-
-/**
- * Two concentric quarter-arcs centred just off the collage's top-left corner,
- * as in the reference: growth green inside the inner arc, teal between the
- * two, and growth green again in the far corner beyond the outer one.
- */
-const ARC_CENTRE_X = scale(50);
-const ARC_INNER = scale(380);
-const ARC_OUTER = scale(860);
-
-function Arc({ radius, color }: { radius: number; color: string }) {
-  return (
-    <div
-      className="absolute rounded-full"
-      style={{
-        width: radius * 2,
-        height: radius * 2,
-        left: ARC_CENTRE_X - radius,
-        top: -radius,
-        background: color,
-      }}
-    />
-  );
-}
-
-function Tile({
-  tile,
-  image,
-}: {
-  tile: TileSpec;
-  /** Admin-supplied photograph for this tile, if there is one. */
-  image: string | undefined;
-}) {
-  const { x, y, w, h, photoId, z } = tile;
-  const width = scale(w);
-  const height = scale(h);
-  return (
-    <div
-      className="group absolute overflow-hidden rounded-[18px] border-[1px] border-white transition-transform duration-500 ease-out hover:z-20 hover:scale-[1.06] motion-reduce:transition-none motion-reduce:hover:scale-100"
-      style={{
-        left: scale(x),
-        top: scale(y),
-        width,
-        height,
-        zIndex: z,
-        boxShadow: "0 18px 32px rgba(16,60,70,0.35)",
-      }}
-    >
-      <ManagedBackdrop
-        value={image}
-        fallbackSrc={placeholderPhotoById({
-          id: photoId,
-          width: width * 2,
-          height: height * 2,
-        })}
-        sizes={`${width}px`}
-        className="object-cover grayscale transition-[filter] duration-500 ease-out group-hover:grayscale-0 motion-reduce:transition-none"
-      />
-    </div>
-  );
-}
+/** `site_content` keys feeding the five collage tiles, in tile order. */
+const COLLAGE_KEYS = [
+  "hero.tile1Image",
+  "hero.tile2Image",
+  "hero.tile3Image",
+  "hero.tile4Image",
+  "hero.tile5Image",
+] as const;
 
 export function Hero({
   content,
@@ -233,29 +103,11 @@ export function Hero({
         </div>
 
         {/* Collage is decorative; hidden on narrow screens to preserve layout. */}
-        <div className="relative hidden h-[480px] w-[560px] shrink-0 lg:block">
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 overflow-hidden rounded-[24px]"
-            style={{ opacity: 0.92 }}
-          >
-            {/* Base layer — shows only in the corner beyond the outer arc. */}
-            <div
-              className="absolute inset-0"
-              style={{ background: "var(--growth)" }}
-            />
-            <Arc radius={ARC_OUTER} color="var(--teal)" />
-            <Arc radius={ARC_INNER} color="var(--growth)" />
-          </div>
-
-          {TILES.map((tile) => (
-            <Tile
-              key={tile.photoId}
-              tile={tile}
-              image={content[tile.contentKey]}
-            />
-          ))}
-        </div>
+        <HeroCollage
+          images={Object.fromEntries(
+            COLLAGE_KEYS.map((key) => [key, content[key]]),
+          )}
+        />
       </div>
 
       {/* Floating stat card — overlaps the next section, per the design. */}
