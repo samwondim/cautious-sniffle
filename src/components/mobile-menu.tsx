@@ -118,7 +118,7 @@ export function MobileMenu({
             initial="closed"
             animate="open"
             exit="closed"
-            className="absolute inset-x-0 top-full z-50 overflow-hidden border-b border-hairline-strong bg-white px-6"
+            className="absolute inset-x-4 top-[calc(100%+8px)] z-50 overflow-hidden rounded-3xl border border-hairline-strong bg-white px-6 shadow-[0_24px_48px_-16px_rgba(16,60,70,0.4)]"
           >
             {/* Padding lives inside, so the collapsing height reaches zero. */}
             <ul className="flex flex-col pt-2">
