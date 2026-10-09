@@ -152,23 +152,3 @@ export function toIconName(value: string | null | undefined): IconName {
 }
 
 /** The hand-drawn gold underline beneath "lasting change" in the hero. */
-export function Squiggle(props: SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      width="100%"
-      height="14"
-      viewBox="0 0 230 14"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-      {...props}
-    >
-      <path
-        d="M2 8 Q 58 1 115 8 T 228 8"
-        stroke="var(--gold)"
-        strokeWidth="4"
-        fill="none"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}

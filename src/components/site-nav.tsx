@@ -39,7 +39,7 @@ export function SiteNav({ content }: { content: SiteContent }) {
       }`}
     >
       <div
-        className={`relative mx-auto max-w-[1440px] backdrop-blur-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
+        className={`site-nav-bar relative mx-auto max-w-[1440px] backdrop-blur-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none ${
           scrolled
             ? "h-14 rounded-full bg-white/85 shadow-[0_12px_32px_-12px_rgba(16,60,70,0.35)] ring-1 ring-ink/10"
             : "h-16"
@@ -88,7 +88,9 @@ export function SiteNav({ content }: { content: SiteContent }) {
                 {content[item.key] || item.fallback}
               </Link>
             ))}
-            {/* Human orange is reserved for the one action we most want. */}
+            {/* The warm filled pill marks the one action we most want. Its
+                fill is `--orange-filled`, not the brand orange: this label
+                is 15px, and white on the brand value is 3.27:1. */}
             <Link
               href="/donate"
               className="btn-donate px-6 py-2.5 text-[15px] font-semibold"

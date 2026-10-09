@@ -40,13 +40,23 @@ const SETTINGS: Record<string, string> = {
   "nav.contact": "Contact",
   "nav.donate": "Donate",
 
-  "hero.eyebrow":
-    "Join our mission across health, education, livelihoods, and the environment.",
-  "hero.titleLead": "Building",
-  "hero.titleHighlight": "lasting change",
-  "hero.titleTail": "one community at a time.",
-  "hero.subtitle":
-    "Every partnership moves a community closer to health, education, and a livelihood it can rely on.",
+  // Concrete nouns, in the organisation's own terms — "Classrooms That Stay
+  // Open" is one of its project titles. What this replaced, "Building lasting
+  // change, one community at a time", contained nothing anyone could check.
+  "hero.title":
+    "Clinics that stay staffed. Classrooms that stay open. Work that pays.",
+  // Both empty on purpose.
+  //
+  // The eyebrow recited the same four-sector list as `org.tagline`, two lines
+  // above the subtitle that recited it again — six times across the site in
+  // total. The hero does not need to repeat what the tagline already says.
+  //
+  // The subtitle is where one checkable fact belongs: a place, a year, a
+  // number this organisation can stand behind. Seeding an invented one would
+  // put a fabricated claim on a page that asks people for money, so it is
+  // left for the team to fill in.
+  "hero.eyebrow": "",
+  "hero.subtitle": "",
   "hero.primaryLabel": "Contact Us",
   "hero.primaryHref": "#contact",
   "hero.secondaryLabel": "See Our Work",

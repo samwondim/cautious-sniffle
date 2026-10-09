@@ -11,10 +11,17 @@
   --teal: #3eacb4; /* Primary. Backgrounds and headers. */
   --teal-strong: #2f878f; /* teal hover / raised */
   --sky: #3ca4c0; /* Secondary. Links and charts. */
-  --orange: #e16d2d; /* Human orange. Accent. Buttons, key moments. Reserved for Donate. */
-  --orange-strong: #c25a24; /* Donate hover */
+  /* Human orange, split in two: the brand value is for accents, and is too
+     light to carry a white label (3.27:1, against the 4.5:1 the nav's 15px
+     Donate label needs). Solid fills use the darker pair — 4.85:1, 6.11:1
+     hovered — so the brand value stays as drawn. */
+  --orange: #e16d2d; /* Human orange. Accent: tints, rules, icons. */
+  --orange-strong: #c25a24; /* accent, raised */
+  --orange-filled: #b45724; /* solid fills carrying a white label */
+  --orange-filled-strong: #9c4b1f; /* those fills, hovered */
   --growth: #3b9861; /* Growth green. Accent. Health and progress. */
   --gold: #e8b02e; /* Sun gold. Accent. Highlights and warmth. */
+  --gold-strong: #cf9a22; /* gold hover — a tonal step on the same hue */
 
   /* Back-compat aliases for existing `bg-forest` / `text-olive` / `bg-accent` usage */
   --forest: var(--teal); /* hero glass tiles */
@@ -47,6 +54,8 @@
   --color-sky: var(--sky);
   --color-orange: var(--orange);
   --color-orange-strong: var(--orange-strong);
+  --color-orange-filled: var(--orange-filled);
+  --color-orange-filled-strong: var(--orange-filled-strong);
   --color-growth: var(--growth);
   --color-forest: var(--forest);
   --color-forest-light: var(--forest-light);
@@ -54,6 +63,7 @@
   --color-accent-strong: var(--accent-strong);
   --color-olive: var(--olive);
   --color-gold: var(--gold);
+  --color-gold-strong: var(--gold-strong);
   --color-mint: var(--mint);
   --color-cream: var(--cream);
   --color-sage: var(--sage);
@@ -69,12 +79,29 @@
     "Segoe UI", Arial, sans-serif;
   --font-display: var(--font-bricolage), var(--font-figtree), Arial, sans-serif;
 
-  /* Type scale from the design */
-  --text-display: 3.5rem; /* 56px hero */
-  --text-display--line-height: 1.15;
+  /* Display type scale. Tracking and leading are per-size and both tighten as
+     the type grows, so one shared `letter-spacing` is wrong at one end of the
+     ramp. Utilities layer after `base`, so these override `.font-display`. */
+  --text-display-sm: 2rem; /* 32px — phone */
+  --text-display-sm--line-height: 1.14;
+  --text-display-sm--letter-spacing: -0.012em;
+  --text-display-md: 2.75rem; /* 44px — tablet; the step the ramp used to skip */
+  --text-display-md--line-height: 1.08;
+  --text-display-md--letter-spacing: -0.018em;
+  --text-display: 3.5rem; /* 56px — desktop hero */
+  --text-display--line-height: 1.03;
+  --text-display--letter-spacing: -0.024em;
+
   --text-section: 2.125rem; /* 34px section titles */
   --text-section--line-height: 1.2;
+  --text-section--letter-spacing: -0.016em;
   --text-stat: 1.125rem; /* 18px stat numbers */
+
+  /* Corner radii. Were arbitrary one-off values at each call site. */
+  --radius-chip: 12px;
+  --radius-tile: 20px;
+  --radius-card: 20px;
+  --radius-frame: 24px;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -106,7 +133,10 @@
     text-decoration: none;
   }
 
-  /* Design: Bricolage Grotesque Bold is the display voice for headings. */
+  /* Design: Bricolage Grotesque Bold is the display voice for headings.
+     The tracking here is the fallback for headings still on arbitrary sizes
+     (`text-[40px]` and friends); anything on a `text-display-*` /
+     `text-section` token takes that token's size-specific value instead. */
   .font-display {
     font-weight: 700;
     letter-spacing: -0.01em;
@@ -116,9 +146,14 @@
     line-height: 1.5;
   }
 
+  /* Two adjacent rings: no single accent carries on every ground here. The
+     old teal ring was 2.70:1 on white, under the 3:1 a focus indicator
+     needs. Ink reads on light, white on dark, and they are always adjacent
+     so their shared edge shows either way. */
   :focus-visible {
-    outline: 2px solid var(--accent);
+    outline: 2px solid var(--ink);
     outline-offset: 2px;
+    box-shadow: 0 0 0 2px #fff;
   }
 }
 
@@ -185,19 +220,37 @@
     background: #ffffff;
   }
 
-  /* Brand buttons — pill per guidelines. Human orange is reserved for the
-     one action we most want (Donate); everything else uses the teal outline. */
+  /* Brand buttons — pill per guidelines.
+     Which filled primary applies is decided by the band behind it, not by
+     which action it is: orange on light grounds, gold on dark (gold reads
+     5.68:1 against the hero band where orange manages 3.42:1).
+     `.btn-secondary` is the outline companion to either.
+
+     `.btn-donate` is not Donate-only despite the name — it is the general
+     light-band primary at twelve call sites, the admin's create actions
+     included. Its fill is `--orange-filled`, not the brand orange, which is
+     too light to carry a white label. */
   .btn-donate {
     border-radius: 9999px;
-    background: var(--orange);
+    background: var(--orange-filled);
     color: #ffffff;
-    transition:
-      background-color 150ms ease,
-      opacity 150ms ease;
   }
 
   .btn-donate:hover {
-    background: var(--orange-strong);
+    background: var(--orange-filled-strong);
+  }
+
+  /* Hero primary. Hover is a tonal step on the same hue (4.72:1); it used to
+     swap gold for green and ink for white, which read as a different button
+     arriving, at a failing 3.59:1. */
+  .btn-gold {
+    border-radius: 9999px;
+    background: var(--gold);
+    color: var(--ink);
+  }
+
+  .btn-gold:hover {
+    background: var(--gold-strong);
   }
 
   .btn-secondary {
@@ -205,9 +258,6 @@
     border: 1.5px solid var(--teal);
     color: var(--ink);
     background: transparent;
-    transition:
-      background-color 150ms ease,
-      color 150ms ease;
   }
 
   .btn-secondary:hover {
@@ -223,6 +273,76 @@
   .btn-secondary-on-dark:hover {
     background: rgba(255, 255, 255, 0.12);
     color: #ffffff;
+  }
+
+  /* Answer on pointer-down, not on release. Touch has no hover, so without
+     this a tap produced no feedback at all until the navigation landed. */
+  .btn-donate,
+  .btn-gold,
+  .btn-secondary {
+    transition:
+      background-color 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease,
+      transform 100ms ease-out;
+  }
+
+  .btn-donate:active,
+  .btn-gold:active,
+  .btn-secondary:active {
+    transform: scale(0.97);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Accessibility preferences                                                  */
+/* -------------------------------------------------------------------------- */
+
+/* `MotionConfig reducedMotion="user"` covers the Motion components but not
+   plain CSS transitions, so this is the backstop for those.
+
+   Narrowing `transition-property` rather than zeroing the duration keeps
+   colour and opacity fades — gentler, not dead — while anything that travels
+   or scales snaps instead. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-property:
+      opacity, background-color, border-color, color, box-shadow, fill,
+      stroke !important;
+  }
+
+  /* Press feedback has to survive, so it swaps to a non-vestibular form
+     rather than vanishing with the transforms. */
+  .btn-donate:active,
+  .btn-gold:active,
+  .btn-secondary:active {
+    transform: none;
+    filter: brightness(0.92);
+  }
+}
+
+/* The sticky nav is the one translucent surface on the site. Frost it solid
+   rather than blurred for anyone who has asked for less transparency, and
+   give it a defined edge under increased contrast. */
+@media (prefers-reduced-transparency: reduce) {
+  .site-nav-bar {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: #ffffff;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .site-nav-bar {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: #ffffff;
+    border: 1px solid var(--ink);
   }
 }
 

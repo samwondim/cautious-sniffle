@@ -27,9 +27,20 @@ const SETTING_DEFAULTS: SiteContent = {
   "nav.work": "Our Work",
   "nav.contact": "Contact",
   "nav.donate": "Donate",
-  "hero.titleLead": "Building",
-  "hero.titleHighlight": "lasting change",
-  "hero.titleTail": "one community at a time.",
+  // One headline field, not three. The lead/highlight/tail split existed only
+  // so the middle fragment could carry a squiggle underline; with that gone
+  // the three rendered as one continuous sentence anyway.
+  //
+  // These defaults are what renders when a key has no row yet, so the
+  // headline carries its real text here and not just in the seed — an
+  // unseeded database must not produce an empty `<h1>`.
+  "hero.title":
+    "Clinics that stay staffed. Classrooms that stay open. Work that pays.",
+  // Optional, and empty on purpose: the eyebrow used to recite the same
+  // four-sector list as `org.tagline`, and the subtitle is where one
+  // checkable fact belongs rather than a seeded abstraction.
+  "hero.eyebrow": "",
+  "hero.subtitle": "",
   "hero.primaryLabel": "Contact Us",
   "hero.primaryHref": "#contact",
   "hero.secondaryLabel": "See Our Work",
@@ -37,12 +48,8 @@ const SETTING_DEFAULTS: SiteContent = {
   // Image slots. Empty means "use the designed placeholder photography"; a
   // value is a media-library reference or a pasted URL, the same as every
   // other image the admin manages.
+  "hero.image": "",
   "hero.backdropImage": "",
-  "hero.tile1Image": "",
-  "hero.tile2Image": "",
-  "hero.tile3Image": "",
-  "hero.tile4Image": "",
-  "hero.tile5Image": "",
   "mission.photo": "",
   "give.photo": "",
   "volunteer.backdropImage": "",

@@ -104,7 +104,7 @@ export function ManagedBackdrop({
   alt = "",
   sizes = "100vw",
   quality,
-  priority,
+  preload,
   className = "object-cover",
 }: {
   value: string | null | undefined;
@@ -113,7 +113,13 @@ export function ManagedBackdrop({
   alt?: string;
   sizes?: string;
   quality?: number;
-  priority?: boolean;
+  /**
+   * Inserts a `<link rel=preload>` in the head. For the LCP candidate only —
+   * preloading several competing candidates helps none of them. Note that
+   * `loading="eager"` is not a lighter alternative: it emits a preload link
+   * of its own. Replaces `priority`, deprecated in Next.js 16.
+   */
+  preload?: boolean;
   className?: string;
 }) {
   const resolved = resolveImageValue(value);
@@ -125,7 +131,8 @@ export function ManagedBackdrop({
       <img
         src={resolved.url}
         alt={alt}
-        loading={priority ? "eager" : "lazy"}
+        loading={preload ? "eager" : "lazy"}
+        fetchPriority={preload ? "high" : undefined}
         className={`absolute inset-0 h-full w-full ${className}`}
       />
     );
@@ -138,7 +145,7 @@ export function ManagedBackdrop({
       fill
       sizes={sizes}
       quality={quality}
-      priority={priority}
+      preload={preload}
       className={className}
     />
   );

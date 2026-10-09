@@ -56,5 +56,21 @@ export function placeholderPhotoById({
   return `${PICSUM_ORIGIN}/id/${id}/${width}/${height}`;
 }
 
-/** Picsum id 28 — a lush forest gorge, chosen for the hero backdrop. */
-export const HERO_BACKDROP_ID = 28;
+/**
+ * Both ids were picked by looking at the whole Picsum catalogue rather than
+ * guessing from the number, so the subjects below are what the photographs
+ * actually show.
+ *
+ * 785: cupped hands holding green growth — the closest thing to care and
+ * stewardship in a placeholder library that has no aid photography in it.
+ */
+export const HERO_PHOTO_ID = 785;
+
+/**
+ * 1001: an adult carrying a child across open ground. Chosen by previewing
+ * the candidates at the scrim opacity they actually sit under — most survive
+ * it as texture and nothing else, while this silhouette still reads as
+ * people going somewhere, which is the only reason to put a photograph
+ * behind a dark band at all.
+ */
+export const HERO_BACKDROP_ID = 1001;

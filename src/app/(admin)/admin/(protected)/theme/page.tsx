@@ -54,8 +54,9 @@ export default async function AdminThemePage() {
           ))}
         </div>
         <p className="mt-4 text-sm text-slate">
-          Copy a hex value into the picker above. Human orange is reserved
-          for Donate buttons — avoid it as the site-wide accent.
+          Copy a hex value into the picker above. Human orange carries the
+          warm call-to-action buttons, so choosing it here would leave links
+          and highlights competing with them — pick a cooler value.
         </p>
       </section>
     </div>
