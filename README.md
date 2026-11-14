@@ -44,7 +44,9 @@ submissions and admin edits write to whatever `DATABASE_URL` names.
 ## Deploying
 
 CI (`.github/workflows/ci.yml`) runs lint, typecheck and build on every push.
-Vercel deploys `main`.
+Vercel's GitHub integration deploys every push to `main` to production and
+every other branch to a preview URL. There is no deploy workflow in GitHub
+Actions; adding one would deploy each commit twice.
 
 **Migrations are not run by the deploy.** After deploying a change that adds
 a file to `drizzle/`, run `npm run db:migrate` with the production
