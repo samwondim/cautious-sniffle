@@ -7,7 +7,7 @@ import { LoginForm } from "@/components/admin/login-form";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Admin login — Empower Humanity",
+  title: "Admin login",
 };
 
 export default async function AdminLoginPage() {

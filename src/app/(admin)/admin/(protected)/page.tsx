@@ -11,6 +11,8 @@ import {
   sectors,
   volunteers,
 } from "@/db/schema";
+import { StatusBadge } from "@/components/admin/table";
+import { formatMoney } from "@/lib/money";
 
 export const metadata = { title: "Overview — Admin" };
 
@@ -35,7 +37,8 @@ export default async function AdminHomePage() {
     statCount,
     givingCount,
     donationCount,
-    donationTotal,
+    raisedByCurrency,
+    pendingDonations,
     newVolunteers,
     newMessages,
     recentDonations,
@@ -46,10 +49,22 @@ export default async function AdminHomePage() {
     count(impactStats),
     count(givingOptions),
     count(donations),
+    // Per currency: an ETB gift and a USD gift cannot be added together.
+    // bigint, because a year of birr in cents overflows a 32-bit sum; the
+    // driver returns bigint as a string.
     db
-      .select({ total: sql<number>`coalesce(sum(amount_cents), 0)::int` })
+      .select({
+        currency: donations.currency,
+        total: sql<string>`sum(${donations.amountCents})::bigint`,
+      })
       .from(donations)
-      .where(eq(donations.status, "completed")),
+      .where(eq(donations.status, "completed"))
+      .groupBy(donations.currency)
+      .orderBy(desc(sql`sum(${donations.amountCents})`)),
+    db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(donations)
+      .where(eq(donations.status, "pending")),
     db
       .select({ count: sql<number>`count(*)::int` })
       .from(volunteers)
@@ -73,10 +88,12 @@ export default async function AdminHomePage() {
       .limit(5),
   ]);
 
-  const raised = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format((donationTotal[0]?.total ?? 0) / 100);
+  const raised =
+    raisedByCurrency.length === 0
+      ? "—"
+      : raisedByCurrency
+          .map((row) => formatMoney(Number(row.total), row.currency))
+          .join(" · ");
 
   const stats = [
     { label: "Sectors", value: sectorCount, href: "/admin/sectors" },
@@ -84,7 +101,12 @@ export default async function AdminHomePage() {
     { label: "Impact stats", value: statCount, href: "/admin/stats" },
     { label: "Giving options", value: givingCount, href: "/admin/giving" },
     { label: "Donations", value: donationCount, href: "/admin/donations" },
-    { label: "Raised (completed)", value: raised, href: "/admin/donations" },
+    { label: "Raised (confirmed)", value: raised, href: "/admin/donations" },
+    {
+      label: "Transfers to confirm",
+      value: pendingDonations[0]?.count ?? 0,
+      href: "/admin/donations",
+    },
     {
       label: "New volunteers",
       value: newVolunteers[0]?.count ?? 0,
@@ -140,12 +162,10 @@ export default async function AdminHomePage() {
                   <span className="min-w-0 truncate text-ink">
                     {d.donorName}{" "}
                     <span className="text-slate">
-                      · {(d.amountCents / 100).toFixed(2)} {d.currency}
+                      · {formatMoney(d.amountCents, d.currency)}
                     </span>
                   </span>
-                  <span className="shrink-0 rounded-full bg-mint px-2.5 py-1 text-xs font-semibold text-accent">
-                    {d.status}
-                  </span>
+                  <StatusBadge status={d.status} />
                 </li>
               ))
             )}
@@ -166,9 +186,7 @@ export default async function AdminHomePage() {
                   <span className="min-w-0 truncate text-ink">
                     {v.name} <span className="text-slate">· {v.interest}</span>
                   </span>
-                  <span className="shrink-0 rounded-full bg-mint px-2.5 py-1 text-xs font-semibold text-accent">
-                    {v.status}
-                  </span>
+                  <StatusBadge status={v.status} />
                 </li>
               ))
             )}

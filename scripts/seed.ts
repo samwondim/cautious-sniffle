@@ -45,20 +45,19 @@ const SETTINGS: Record<string, string> = {
   // change, one community at a time", contained nothing anyone could check.
   "hero.title":
     "Clinics that stay staffed. Classrooms that stay open. Work that pays.",
-  // Both empty on purpose.
-  //
-  // The eyebrow recited the same four-sector list as `org.tagline`, two lines
-  // above the subtitle that recited it again — six times across the site in
-  // total. The hero does not need to repeat what the tagline already says.
-  //
+  // The eyebrow is the identity line: who this is and where it works, which
+  // nothing else on the first screen says. It used to recite the same
+  // four-sector list as `org.tagline`, two lines above a subtitle that
+  // recited it again.
+  "hero.eyebrow": "Empower Humanity · Community-led programs across Ethiopia",
   // The subtitle is where one checkable fact belongs: a place, a year, a
   // number this organisation can stand behind. Seeding an invented one would
   // put a fabricated claim on a page that asks people for money, so it is
   // left for the team to fill in.
-  "hero.eyebrow": "",
   "hero.subtitle": "",
-  "hero.primaryLabel": "Contact Us",
-  "hero.primaryHref": "#contact",
+  // Donate is the one dominant action; Contact stays in the nav and footer.
+  "hero.primaryLabel": "Donate",
+  "hero.primaryHref": "/donate",
   "hero.secondaryLabel": "See Our Work",
   "hero.secondaryHref": "#work",
 
@@ -106,17 +105,25 @@ const SETTINGS: Record<string, string> = {
   "contact.email": "hello@empower-humanity.org",
   "contact.phone": "+1 555 0142 889",
   "contact.address": "Global programs · Remote-first",
+  "contact.eyebrow": "Contact",
+  "contact.title": "Let's talk.",
+  "contact.subtitle":
+    "Questions about our programs, a partnership, or a gift — send us a note and our team will reply within two working days.",
+  "donate.formBody":
+    "Tell us what you sent and we'll match it to our bank statement, confirm it has arrived, and email your receipt.",
   "social.emailHref": "mailto:hello@empower-humanity.org",
-  "social.websiteHref": "#",
-  "social.communityHref": "#contact",
+  "social.websiteHref": "",
+  "social.communityHref": "",
 
+  "footer.statement": "Every partnership moves a community closer.",
+  "footer.contactLabel": "Get in touch",
   "footer.copyright": "© 2026 Empower Humanity. All rights reserved.",
 
   "donate.eyebrow": "Support Our Work",
   "donate.title": "Your gift, their tomorrow.",
   "donate.subtitle":
     "Every contribution goes directly toward health, education, livelihoods, and environmental programs led by the communities they serve.",
-  "donate.formTitle": "Make a Gift",
+  "donate.formTitle": "Sent a transfer? Let us know.",
   "donate.localTitle": "Local bank transfer",
   "donate.localBody":
     "Transfers from any Ethiopian bank. Please use your full name as the transfer reference so we can send you a receipt.",
@@ -129,7 +136,7 @@ const SETTINGS: Record<string, string> = {
   "donate.impactTitle": "Where Your Gift Goes",
   "donate.secureTitle": "Secure & accountable",
   "donate.secureBody":
-    "Payments are processed securely. Empower Humanity is a registered nonprofit; gifts may be tax-deductible. Cancel a monthly gift anytime.",
+    "Every transfer goes straight into Empower Humanity's own registered accounts — no platform or intermediary takes a cut. Tell us when you've sent a gift and we'll confirm it has arrived and email your receipt. Monthly gifts are a standing order with your own bank, so you can change or stop one at any time.",
 };
 
 const SECTORS = [

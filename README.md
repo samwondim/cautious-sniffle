@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Empower Humanity
 
-## Getting Started
+The public website and content admin for Empower Humanity: a Next.js 16 app
+with a Postgres database (Neon in production), deployed on Vercel.
 
-First, run the development server:
+- **Public site**: home, Mission & Vision, What We Do, Our Work (with a page
+  per project), Gallery, Donate (bank transfer), Contact, Privacy, Cookies.
+- **Admin** at `/admin`: every word and image on the site, projects, impact
+  stats, bank accounts, a media library, and inboxes for volunteers,
+  messages and reported transfers.
+
+## Local development
+
+Requirements: Node 20+, and either a local Postgres or a Neon branch.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local   # then fill in the values
+npm install
+npm run db:setup             # create the database, migrate, seed sample content
+npm run dev                  # http://localhost:3000, admin at /admin
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The seed creates an admin account from `SEED_ADMIN_EMAIL` and
+`SEED_ADMIN_PASSWORD`. Those defaults are for local development only. Never
+use them on a deployed database.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Point local development at a Neon **branch**, not at production: form
+submissions and admin edits write to whatever `DATABASE_URL` names.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+| Command | What it does |
+|---|---|
+| `npm run dev` | Development server |
+| `npm run build` / `npm start` | Production build / serve it |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | Route types + TypeScript |
+| `npm run db:generate` | New migration from `src/db/schema.ts` changes |
+| `npm run db:migrate` | Apply migrations in `drizzle/` to `DATABASE_URL` |
+| `npm run db:seed` | Seed sample content and the admin account |
+| `npm run db:reset` | Drop and recreate the local database |
+| `npm run db:studio` | Drizzle Studio |
 
-To learn more about Next.js, take a look at the following resources:
+## Deploying
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+CI (`.github/workflows/ci.yml`) runs lint, typecheck and build on every push.
+Vercel deploys `main`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Migrations are not run by the deploy.** After deploying a change that adds
+a file to `drizzle/`, run `npm run db:migrate` with the production
+`DATABASE_URL`.
 
-## Deploy on Vercel
+## Environment variables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+See `.env.example` for the full list with notes. Optional extras:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `NEXT_PUBLIC_SITE_URL`: the public origin, for share cards, the sitemap and
+  links in emails. On Vercel it defaults to the production domain.
+- `RESEND_API_KEY`, `NOTIFY_EMAIL_FROM`, `NOTIFY_EMAIL_TO`: staff email
+  alerts for new volunteers, messages and transfer notices. Alerts are off
+  when these are unset, and submissions still land in the admin.
+
+## Where things live
+
+| Path | Contents |
+|---|---|
+| `src/app/(site)` | Public pages |
+| `src/app/(admin)` | Admin (all of it `noindex`) |
+| `src/app/actions` | Server Actions: `public.ts` (forms), `admin.ts`, `media.ts` |
+| `src/lib/content.ts` | Content defaults and queries; every editable key starts here |
+| `src/lib/notify.ts` | Staff email alerts |
+| `src/db/schema.ts` | Database schema |
+| `src/assets/fonts` | Static brand font cuts used by the share image |
+| `docs/` | Handoff notes |

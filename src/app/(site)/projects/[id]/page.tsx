@@ -41,9 +41,23 @@ export async function generateMetadata({ params }: PageProps<"/projects/[id]">) 
   const id = parseId((await params).id);
   const project = id === null ? undefined : await getPublishedProject(id);
   if (!project) return { title: "Project not found" };
+  const title = `${project.title} — ${project.location}`;
   return {
-    title: `${project.title} — ${project.location}`,
+    title,
     description: project.summary,
+    // A shared project link should show that project's photograph, not the
+    // generic brand card. `openGraph` replaces the root object wholesale, so
+    // siteName is restated. With no photograph the field is left unset and
+    // the root `opengraph-image` applies.
+    ...(project.imageUrl && {
+      openGraph: {
+        type: "article",
+        siteName: "Empower Humanity",
+        title,
+        description: project.summary ?? undefined,
+        images: [{ url: project.imageUrl, alt: project.title }],
+      },
+    }),
   };
 }
 

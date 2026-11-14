@@ -9,8 +9,7 @@
  * reveals begin, which is what ties the two together.
  *
  * Purely decorative: `aria-hidden`, no text, no animation of its own. The
- * hero's own bottom edge stays straight, because the floating stat card
- * crosses it.
+ * hero's own bottom edge stays straight.
  */
 
 type BandTone = "white" | "mint" | "cream" | "ink" | "ink-deep";

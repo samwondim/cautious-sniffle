@@ -8,7 +8,7 @@ import { getPublishedGalleryImages, getSiteContent } from "@/lib/content";
 export async function generateMetadata() {
   const content = await getSiteContent();
   return {
-    title: content["gallery.title"] || "Gallery",
+    title: "Gallery",
     description: content["gallery.subtitle"] || content["org.tagline"],
   };
 }

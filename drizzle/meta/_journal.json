@@ -50,6 +50,20 @@
       "when": 1791237547674,
       "tag": "0006_youthful_scarecrow",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794517388552,
+      "tag": "0007_contact_page_and_transfer_notices",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794551799537,
+      "tag": "0008_hero_donate_cta",
+      "breakpoints": true
     }
   ]
 }

@@ -76,14 +76,15 @@ export function SiteNav({ content }: { content: SiteContent }) {
             <span className="sr-only">{content["org.name"]}</span>
           </Link>
 
-          {/* Six links at `md` is tight, so the gap grows with the viewport
-              rather than wrapping the row. */}
-          <nav className="hidden items-center gap-5 md:flex lg:gap-8">
+          {/* Six links plus Donate don't fit a tablet's width without the
+              labels wrapping into the logo, so the row starts at `lg` and
+              tablets get the menu button. Labels never wrap. */}
+          <nav className="hidden items-center gap-6 lg:flex xl:gap-8">
             {PRIMARY_NAV.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-[15px] font-medium transition-opacity hover:opacity-60"
+                className="whitespace-nowrap text-[15px] font-medium transition-opacity hover:opacity-60"
               >
                 {content[item.key] || item.fallback}
               </Link>
@@ -93,7 +94,7 @@ export function SiteNav({ content }: { content: SiteContent }) {
                 is 15px, and white on the brand value is 3.27:1. */}
             <Link
               href="/donate"
-              className="btn-donate px-6 py-2.5 text-[15px] font-semibold"
+              className="btn-donate whitespace-nowrap px-6 py-2.5 text-[15px] font-semibold"
             >
               {content["nav.donate"]}
             </Link>

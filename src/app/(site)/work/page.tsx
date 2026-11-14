@@ -8,7 +8,7 @@ import { getPublishedProjects, getSiteContent } from "@/lib/content";
 export async function generateMetadata() {
   const content = await getSiteContent();
   return {
-    title: content["work.title"] || "Our Work",
+    title: content["nav.work"] || "Our Work",
     description: content["work.subtitle"] || content["org.tagline"],
   };
 }

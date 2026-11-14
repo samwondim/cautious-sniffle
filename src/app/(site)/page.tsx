@@ -37,8 +37,8 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* The hero keeps a straight edge: the stat card hangs across it. From
-          there the arcs alternate side, left then right then left. */}
+      {/* The hero keeps a straight edge into the sectors band. From there
+          the arcs alternate side, left then right then left. */}
       <Hero content={content} stats={stats} />
       <Sectors content={content} sectors={sectors.slice(0, HOME_SECTORS)} />
       <BandSeam from="mint" to="white" side="left" />

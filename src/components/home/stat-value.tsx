@@ -51,7 +51,7 @@ const COUNT_DURATION = 1.2;
 const REVEAL_FALLBACK_MS = 2000;
 
 /**
- * Counts up to its value when the stat card scrolls into view.
+ * Counts up to its value when the hero's impact figures scroll into view.
  *
  * The full value is server-rendered, so crawlers and a failed JS load still
  * read the real figure (the `<noscript>` rule in the site layout un-hides it).

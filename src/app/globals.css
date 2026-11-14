@@ -36,9 +36,19 @@
   /* Warm + supporting */
   --mint: #edf6f7; /* alternating light band (pale teal) */
   --cream: #fef6e0; /* "Our Work" band (pale gold) */
-  --sage: #6f8f96; /* muted labels on dark */
+  /* Decorative only (rules, icons, fills). Fails WCAG AA for text: 3.44:1 on
+     ink, 3.47:1 on white, under the 4.5:1 small text needs. Muted text on
+     dark is `text-mist/70` (5.46:1 on ink); on light it is `text-slate`
+     (6.36:1 on white). */
+  --sage: #6f8f96;
   --mist: #d4e7ea; /* body copy on dark */
   --slate: #47646b; /* body copy on light (ink at ~70%) */
+  /* Form placeholders: slate mixed 25% toward sage. 5.41:1 on white and
+     4.85:1 on the soft field grey #f1f3f2 (AA needs 4.5:1), yet visibly
+     lighter than both the typed value (--ink, 2.21:1 apart) and the slate
+     field labels, so a hint never reads as entered text. Sage itself
+     (3.12:1 on the grey) fails. */
+  --placeholder: #516f76;
   --hairline: rgba(16, 60, 70, 0.16);
   --hairline-strong: rgba(16, 60, 70, 0.28);
 
@@ -191,7 +201,42 @@
   }
 
   .field-input::placeholder {
-    color: #7d949a;
+    color: var(--placeholder);
+    /* Firefox dims placeholders by default; show the colour as set. */
+    opacity: 1;
+  }
+
+  .field-input:hover {
+    border-color: rgba(16, 60, 70, 0.5);
+  }
+
+  /* The global :focus-visible ring still draws on keyboard focus; this
+     border change also marks the active field for mouse and touch users,
+     who get no ring. */
+  .field-input:focus {
+    border-color: var(--teal-strong);
+  }
+
+  .field-input[aria-invalid="true"] {
+    border-color: #b42318;
+  }
+
+  /* iOS Safari zooms the page into any field under 16px on focus, and does
+     not zoom back out. Touch devices get 16px; desktops keep the design's
+     smaller size. */
+  @media (pointer: coarse) {
+    .field-input,
+    .field-input-soft {
+      font-size: 16px;
+    }
+  }
+
+  textarea.field-input {
+    height: auto;
+    min-height: 148px;
+    padding: 12px 14px;
+    line-height: 1.55;
+    resize: vertical;
   }
 
   /* Filled, borderless variant used on the volunteer panel, where the design
@@ -212,7 +257,21 @@
   }
 
   .field-input-soft::placeholder {
-    color: #7d949a;
+    color: var(--placeholder);
+    /* Firefox dims placeholders by default; show the colour as set. */
+    opacity: 1;
+  }
+
+  /* A required select whose disabled empty option is still chosen is
+     showing its prompt ("Area of interest"), which plays the placeholder
+     role, so it takes the placeholder colour. The options themselves keep
+     the value colour in the open list. */
+  select.field-input-soft:invalid {
+    color: var(--placeholder);
+  }
+
+  select.field-input-soft option {
+    color: var(--ink);
   }
 
   .field-input-soft:focus {

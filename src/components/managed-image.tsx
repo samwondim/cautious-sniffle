@@ -91,8 +91,8 @@ export function ManagedImage({
  * Backdrop variant: fills a frame the caller has already positioned.
  *
  * `ManagedImage` brings its own `relative` wrapper, which fights a parent that
- * is already `absolute inset-0` — the hero and volunteer backdrops, and the
- * hero collage tiles. This renders the picture alone, so the caller keeps
+ * is already positioned — the volunteer backdrop and the hero photograph
+ * frame. This renders the picture alone, so the caller keeps
  * ownership of the box.
  *
  * `fallbackSrc` is the designed stand-in for an empty slot, built with the

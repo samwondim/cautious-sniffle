@@ -8,8 +8,8 @@ import { getPublishedSectors, getSiteContent } from "@/lib/content";
 export async function generateMetadata() {
   const content = await getSiteContent();
   return {
-    title: content["sectors.title"] || "What We Do",
-    description: content["org.tagline"],
+    title: content["nav.sectors"] || "What We Do",
+    description: content["org.tagline"] || undefined,
   };
 }
 

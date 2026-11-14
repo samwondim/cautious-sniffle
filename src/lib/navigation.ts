@@ -23,12 +23,47 @@ export const PRIMARY_NAV: readonly NavItem[] = [
   // Signing up is a home-page band, not a page: the form is the conversion
   // point and sits with the pitch beside it.
   { key: "volunteer.eyebrow", href: "/#volunteer", fallback: "Get Involved" },
+  // Last before Donate: the hero's primary button is Donate, so this is the
+  // only route to /contact above the footer.
+  { key: "nav.contact", href: "/contact", fallback: "Contact" },
 ] as const;
 
-/** The footer carries the same routes plus the two the header has no room for. */
-export const FOOTER_NAV: readonly NavItem[] = [
-  ...PRIMARY_NAV,
-  { key: "give.eyebrow", href: "/#give", fallback: "Make a Gift" },
-  // The footer itself is `id="contact"`, so this is a same-page anchor.
-  { key: "nav.contact", href: "/#contact", fallback: "Contact" },
+/** A titled group of footer links. */
+export type NavGroup = {
+  /** Visible heading, also the group's accessible name. */
+  label: string;
+  items: readonly NavItem[];
+};
+
+const navItem = (href: string) => {
+  const item = PRIMARY_NAV.find((entry) => entry.href === href);
+  if (!item) throw new Error(`No primary nav item for ${href}`);
+  return item;
+};
+
+/**
+ * The footer carries the same routes, split into two short groups: what the
+ * organisation is, and the ways to support it. Donate is listed as well as
+ * shown as the footer's button, because scanning a column is how people look
+ * for it. Contact has no link here: the footer's "Get in touch" button and
+ * its contact column both cover it.
+ */
+export const FOOTER_NAV_GROUPS: readonly NavGroup[] = [
+  {
+    label: "Explore",
+    items: [
+      navItem("/about"),
+      navItem("/what-we-do"),
+      navItem("/work"),
+      navItem("/gallery"),
+    ],
+  },
+  {
+    label: "Support",
+    items: [
+      navItem("/#volunteer"),
+      { key: "give.eyebrow", href: "/#give", fallback: "Make a Gift" },
+      { key: "nav.donate", href: "/donate", fallback: "Donate" },
+    ],
+  },
 ] as const;

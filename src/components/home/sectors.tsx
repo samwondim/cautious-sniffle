@@ -46,11 +46,8 @@ export function Sectors({
   content: SiteContent;
   sectors: Sector[];
 }) {
-  // Extra top padding clears the hero stat card that overlaps this band. It is
-  // repeated at `lg` because `Section`'s own `lg:py-24` is emitted after the
-  // `md` layer, and its `padding-block` would otherwise win at desktop widths.
   return (
-    <Section id="what-we-do" tone="mint" className="pt-20 md:pt-40 lg:pt-40">
+    <Section id="what-we-do" tone="mint">
       <motion.div {...reveal()} className="flex flex-col gap-3">
         <Eyebrow>{content["sectors.eyebrow"]}</Eyebrow>
         <SectionTitle>{content["sectors.title"]}</SectionTitle>

@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { BandSeam } from "@/components/band-seam";
 import { CopyValue } from "@/components/copy-value";
+import { TransferNoticeForm } from "@/components/forms";
 import { Icon, toIconName } from "@/components/icons";
 import { Eyebrow, Section, SectionTitle } from "@/components/section";
 import type { BankAccount } from "@/db/schema";
@@ -144,6 +145,9 @@ export default async function DonatePage() {
   const local = accounts.filter((a) => a.scope === "local");
   const international = accounts.filter((a) => a.scope === "international");
   const notice = content["donate.placeholderNotice"];
+  // Offered in the order the accounts are listed, local first, so the
+  // currency most donors use is the form's default.
+  const currencies = [...new Set(accounts.map((a) => a.currency))];
 
   return (
     <>
@@ -197,7 +201,7 @@ export default async function DonatePage() {
           {accounts.length === 0 ? (
             <p className="text-slate">
               Bank details are not published yet. Please{" "}
-              <Link href="/#contact" className="font-semibold text-accent">
+              <Link href="/contact" className="font-semibold text-accent">
                 contact us
               </Link>{" "}
               to arrange a gift.
@@ -206,9 +210,42 @@ export default async function DonatePage() {
         </div>
       </Section>
 
+      {currencies.length > 0 ? (
+        <>
+          <BandSeam from="white" to="cream" side="left" />
+          <Section tone="cream" id="transfer-notice">
+            <div className="grid gap-12 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-20">
+              <motion.div {...reveal()} className="flex flex-col gap-4">
+                <Eyebrow>After you give</Eyebrow>
+                <SectionTitle>
+                  {content["donate.formTitle"] || "Sent a transfer? Let us know."}
+                </SectionTitle>
+                {content["donate.formBody"] ? (
+                  <p className="max-w-[460px] text-[16px] leading-[1.65] text-slate">
+                    {content["donate.formBody"]}
+                  </p>
+                ) : null}
+              </motion.div>
+              {/* Unanimated: a form that fades in can be typed into while
+                  still invisible. */}
+              <div
+                className="rounded-3xl bg-white p-6 sm:p-9"
+                style={{ boxShadow: "0 18px 40px rgba(16,60,70,0.08)" }}
+              >
+                <TransferNoticeForm currencies={currencies} />
+              </div>
+            </div>
+          </Section>
+        </>
+      ) : null}
+
       {givingOptions.length > 0 ? (
         <>
-          <BandSeam from="white" to="mint" side="right" />
+          <BandSeam
+            from={currencies.length > 0 ? "cream" : "white"}
+            to="mint"
+            side="right"
+          />
           <Section tone="mint">
             <motion.div {...reveal()} className="flex flex-col gap-3">
               <Eyebrow>{content["donate.eyebrow"]}</Eyebrow>

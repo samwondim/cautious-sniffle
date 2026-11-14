@@ -36,20 +36,21 @@ const SETTING_DEFAULTS: SiteContent = {
   // unseeded database must not produce an empty `<h1>`.
   "hero.title":
     "Clinics that stay staffed. Classrooms that stay open. Work that pays.",
-  // Optional, and empty on purpose: the eyebrow used to recite the same
-  // four-sector list as `org.tagline`, and the subtitle is where one
-  // checkable fact belongs rather than a seeded abstraction.
-  "hero.eyebrow": "",
+  // The identity line above the headline: who this is and where it works,
+  // which nothing else on the first screen says. (It used to recite the
+  // four-sector list from `org.tagline`.) The subtitle stays empty: it is
+  // where one checkable fact belongs rather than a seeded abstraction.
+  "hero.eyebrow": "Empower Humanity · Community-led programs across Ethiopia",
   "hero.subtitle": "",
-  "hero.primaryLabel": "Contact Us",
-  "hero.primaryHref": "#contact",
+  // Donate is the one dominant action; Contact stays in the nav and footer.
+  "hero.primaryLabel": "Donate",
+  "hero.primaryHref": "/donate",
   "hero.secondaryLabel": "See Our Work",
   "hero.secondaryHref": "#work",
   // Image slots. Empty means "use the designed placeholder photography"; a
   // value is a media-library reference or a pasted URL, the same as every
   // other image the admin manages.
   "hero.image": "",
-  "hero.backdropImage": "",
   "mission.photo": "",
   "give.photo": "",
   "volunteer.backdropImage": "",
@@ -83,13 +84,25 @@ const SETTING_DEFAULTS: SiteContent = {
   "contact.email": "",
   "contact.phone": "",
   "contact.address": "",
-  "social.emailHref": "#",
-  "social.websiteHref": "#",
-  "social.communityHref": "#contact",
+  "contact.eyebrow": "Contact",
+  "contact.title": "Let's talk.",
+  "contact.subtitle":
+    "Questions about our programs, a partnership, or a gift — send us a note and our team will reply within two working days.",
+  "donate.formBody":
+    "Tell us what you sent and we'll match it to our bank statement, confirm it has arrived, and email your receipt.",
+  "donate.secureBody":
+    "Every transfer goes straight into Empower Humanity's own registered accounts — no platform or intermediary takes a cut. Tell us when you've sent a gift and we'll confirm it has arrived and email your receipt. Monthly gifts are a standing order with your own bank, so you can change or stop one at any time.",
+  "social.emailHref": "",
+  "social.websiteHref": "",
+  "social.communityHref": "",
+  // The footer's closing line, set large above its Donate / Get in touch
+  // buttons. Empty hides the line and keeps the buttons.
+  "footer.statement": "Every partnership moves a community closer.",
+  "footer.contactLabel": "Get in touch",
   "footer.copyright": "© 2026 Empower Humanity. All rights reserved.",
   "donate.eyebrow": "Support Our Work",
   "donate.title": "Your gift, their tomorrow.",
-  "donate.formTitle": "Make a Gift",
+  "donate.formTitle": "Sent a transfer? Let us know.",
   "donate.localTitle": "Local bank transfer",
   "donate.localBody":
     "Transfers from any Ethiopian bank. Please use your full name as the transfer reference so we can send you a receipt.",

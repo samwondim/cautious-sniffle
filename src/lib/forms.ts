@@ -6,6 +6,12 @@ export type ActionState = {
   message?: string;
   /** Field-level messages keyed by input name. */
   fieldErrors?: Record<string, string>;
+  /**
+   * What was submitted, returned on error. React resets a form after its
+   * action runs — even when validation fails — so fields read their
+   * `defaultValue` from here to come back filled instead of blank.
+   */
+  values?: Record<string, string>;
 };
 
 export const IDLE: ActionState = { status: "idle" };
@@ -25,44 +31,54 @@ const email = z
 
 const honeypot = z.string().max(0, "Rejected.");
 
-export const donationSchema = z
+/**
+ * Largest single transfer the form accepts, in major units of any currency.
+ * `amount_cents` is a 32-bit integer, which tops out near 21.4 million; this
+ * leaves headroom and routes genuinely large gifts to a conversation instead.
+ */
+export const MAX_TRANSFER_AMOUNT = 10_000_000;
+
+/**
+ * "I've sent a bank transfer" — the donor telling staff a gift is on its way,
+ * so it can be matched against the statement and receipted. Nothing is paid
+ * through the site; the row lands in the admin as `pending` until staff see
+ * the money arrive.
+ *
+ * `currency` is checked for shape here; the action also checks it against
+ * the currencies of the published bank accounts, which only it can read.
+ */
+export const transferNoticeSchema = z
   .object({
-    frequency: z.enum(["one_time", "monthly"]),
-    amount: z.union([z.literal(""), z.string()]).optional(),
-    customAmount: z.string().trim().max(20).optional(),
+    frequency: z.enum(["one_time", "monthly"], {
+      error: "Please choose one-off or monthly.",
+    }),
+    amount: z.string().trim().min(1, "Please enter the amount you sent."),
+    currency: z
+      .string()
+      .trim()
+      .regex(/^[A-Z]{3}$/, "Please choose a currency."),
     name,
     email,
-    message: z.string().trim().max(2000).optional(),
-    // Must stay empty; bots that fill every field get rejected.
+    message: z.string().trim().max(2000, "Please keep this under 2,000 characters.").optional(),
     company: honeypot.optional(),
   })
   .transform((data, ctx) => {
-    const custom = (data.customAmount ?? "").replace(/[^\d.]/g, "");
-    const amountValue = custom
-      ? Number.parseFloat(custom)
-      : Number.parseFloat(data.amount ?? "");
+    // Accept what people actually type: "5,000", "5 000", "ETB 5000".
+    const amountValue = Number.parseFloat(data.amount.replace(/[^\d.]/g, ""));
 
     if (!Number.isFinite(amountValue) || amountValue <= 0) {
       ctx.addIssue({
         code: "custom",
         path: ["amount"],
-        message: "Please choose an amount or enter a custom gift.",
+        message: "Please enter the amount you sent.",
       });
       return z.NEVER;
     }
-    if (amountValue < 1) {
+    if (amountValue > MAX_TRANSFER_AMOUNT) {
       ctx.addIssue({
         code: "custom",
         path: ["amount"],
-        message: "The minimum gift is $1.",
-      });
-      return z.NEVER;
-    }
-    if (amountValue > 1_000_000) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["amount"],
-        message: "Please contact us directly for gifts above $1,000,000.",
+        message: "For a gift this size, please contact us directly so we can thank you properly.",
       });
       return z.NEVER;
     }
@@ -70,14 +86,14 @@ export const donationSchema = z
     return {
       frequency: data.frequency,
       amountCents: Math.round(amountValue * 100),
+      currency: data.currency,
       name: data.name,
       email: data.email,
-      message: data.message?.trim() || null,
+      message: data.message || null,
     };
   });
 
-export type DonationInput = z.input<typeof donationSchema>;
-export type DonationResult = z.output<typeof donationSchema>;
+export type TransferNotice = z.output<typeof transferNoticeSchema>;
 
 export const volunteerSchema = z.object({
   name,
@@ -93,7 +109,12 @@ export const contactSchema = z.object({
   name,
   email,
   subject: z.string().trim().min(3, "Please add a subject.").max(200),
-  body: z.string().trim().min(10, "Please add a message.").max(5000),
+  body: z
+    .string()
+    .trim()
+    .min(1, "Please add a message.")
+    .min(10, "Please write a little more so we can help.")
+    .max(5000, "Please keep this under 5,000 characters."),
   company: honeypot.optional(),
 });
 

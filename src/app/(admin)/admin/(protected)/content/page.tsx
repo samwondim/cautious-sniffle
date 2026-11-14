@@ -50,9 +50,9 @@ const GROUPS: Group[] = [
       },
       {
         key: "hero.eyebrow",
-        label: "Eyebrow",
+        label: "Identity line",
         long: true,
-        hint: "Optional, and usually better empty. Do not repeat the tagline here.",
+        hint: "Sits above the headline: who you are and where you work, e.g. \"Empower Humanity · Community-led programs across Ethiopia\". Keep it short; leave empty to hide it.",
       },
       { key: "hero.primaryLabel", label: "Primary button label" },
       { key: "hero.primaryHref", label: "Primary button link" },
@@ -62,13 +62,7 @@ const GROUPS: Group[] = [
         key: "hero.image",
         label: "Photograph",
         image: true,
-        hint: "Shown large and in colour beside the headline, so it wants one clear subject. Leave empty for the placeholder.",
-      },
-      {
-        key: "hero.backdropImage",
-        label: "Background photograph",
-        image: true,
-        hint: "Sits behind a dark scrim, so only broad shapes survive — a silhouette or an open landscape reads, fine detail does not. Leave empty for the placeholder.",
+        hint: "A real photograph of the work, shown large beside the headline (portrait on desktop, cropped landscape on phones), so keep the subject near the centre. Leave empty for the placeholder.",
       },
     ],
   },
@@ -142,12 +136,15 @@ const GROUPS: Group[] = [
   {
     title: "Contact & social",
     fields: [
+      { key: "contact.eyebrow", label: "Contact page eyebrow" },
+      { key: "contact.title", label: "Contact page title" },
+      { key: "contact.subtitle", label: "Contact page subtitle", long: true },
       { key: "contact.email", label: "Email" },
       { key: "contact.phone", label: "Phone" },
       { key: "contact.address", label: "Address" },
-      { key: "social.emailHref", label: "Email link" },
-      { key: "social.websiteHref", label: "Website link" },
-      { key: "social.communityHref", label: "Community link" },
+      { key: "social.emailHref", label: "Email link (leave empty to hide)" },
+      { key: "social.websiteHref", label: "Website link (leave empty to hide)" },
+      { key: "social.communityHref", label: "Community link (leave empty to hide)" },
     ],
   },
   {
@@ -162,7 +159,15 @@ const GROUPS: Group[] = [
   },
   {
     title: "Footer",
-    fields: [{ key: "footer.copyright", label: "Copyright line" }],
+    fields: [
+      {
+        key: "footer.statement",
+        label: "Closing line",
+        hint: "Set large above the footer's Donate button. Leave empty to show the buttons alone.",
+      },
+      { key: "footer.contactLabel", label: "Contact button label" },
+      { key: "footer.copyright", label: "Copyright line" },
+    ],
   },
   {
     title: "Donate page",
@@ -170,7 +175,8 @@ const GROUPS: Group[] = [
       { key: "donate.eyebrow", label: "Eyebrow" },
       { key: "donate.title", label: "Title" },
       { key: "donate.subtitle", label: "Subtitle", long: true },
-      { key: "donate.formTitle", label: "Form title" },
+      { key: "donate.formTitle", label: "Transfer notice title" },
+      { key: "donate.formBody", label: "Transfer notice body", long: true },
       { key: "donate.localTitle", label: "Local section title" },
       { key: "donate.localBody", label: "Local section body", long: true },
       {

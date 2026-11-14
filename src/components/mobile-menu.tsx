@@ -68,7 +68,7 @@ const BARS = [
   },
 ];
 
-/** Hamburger menu for small screens — the desktop nav is `hidden md:flex`. */
+/** Hamburger menu for phones and tablets — the desktop nav is `hidden lg:flex`. */
 export function MobileMenu({
   items,
   donateHref,
@@ -81,7 +81,7 @@ export function MobileMenu({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
