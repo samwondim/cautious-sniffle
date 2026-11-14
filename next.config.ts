@@ -23,26 +23,8 @@ const nextConfig: NextConfig = {
       { pathname: "/brand/**", search: "" },
       // Uploaded media, streamed from `src/app/api/media/[id]/route.ts`.
       { pathname: "/api/media/**", search: "" },
-    ],
-    remotePatterns: [
-      {
-        // Placeholder photography — see `src/lib/placeholder-image.ts`.
-        // picsum.photos 302s to fastly.picsum.photos; the optimizer follows
-        // that redirect server-side, so only this origin needs allowlisting.
-        protocol: "https",
-        hostname: "picsum.photos",
-        port: "",
-        pathname: "/seed/**",
-        search: "",
-      },
-      {
-        // Pinned picsum ids, for slots where the subject matters.
-        protocol: "https",
-        hostname: "picsum.photos",
-        port: "",
-        pathname: "/id/**",
-        search: "",
-      },
+      // Bundled stand-in photography — see `src/lib/placeholder-image.ts`.
+      { pathname: "/placeholders/**", search: "" },
     ],
   },
 };

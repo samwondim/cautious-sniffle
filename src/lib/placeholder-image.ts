@@ -2,27 +2,79 @@
  * Placeholder photography for slots that have no real image yet.
  *
  * The site is designed around photographs the organisation has not supplied
- * yet — the hero collage, the mission and giving portraits, and any project
+ * yet — the hero photograph, the mission and giving portraits, and any project
  * whose `imageUrl` is still null. Rather than leave those slots as empty
- * frames, they render stock photos from picsum.photos.
+ * frames, they render stand-in photographs from `public/placeholders`.
  *
- * These are stand-ins, not final art. Every URL is built here so that
- * swapping in real photography is a change to this one module plus the
- * `remotePatterns` entry in `next.config.ts`.
+ * The files are local copies of Pexels-licensed photographs, so a page never
+ * depends on a third-party image host at runtime. They are stand-ins, not final
+ * art: real photography replaces one by dropping a file into the folder and
+ * pointing the entry below at it. `next/image` optimises them like any other
+ * local asset.
  *
- * Seeds matter: picsum's `/seed/:seed` route is deterministic, so a given
- * seed always resolves to the same photograph. Passing a stable seed (a
- * slot name, or a project's primary key) keeps the page from reshuffling
- * its imagery on every request.
+ * Seeds matter: a given seed always resolves to the same photograph, so a page
+ * does not reshuffle its imagery between requests. Slots whose subject matters
+ * are pinned by name or id; the rest are spread across the pool that matches
+ * the requested orientation. See `public/placeholders/README.md` for sources.
  */
 
-const PICSUM_ORIGIN = "https://picsum.photos";
+const PLACEHOLDER_DIR = "/placeholders";
+
+/** Slots whose stand-in should depict something specific. */
+const CURATED: Record<string, string> = {
+  // Cupped hands holding a seedling — care and stewardship.
+  "eh-hero": "hero-growth",
+  // A volunteer carrying a child through a community event.
+  "eh-mission-portrait": "mission-community",
+  // Young volunteers smiling together.
+  "eh-give-at-work": "give-care",
+  // Volunteers organising aid supplies for distribution.
+  "eh-volunteer-backdrop": "volunteer-aid",
+};
+
+/** Portrait-shaped stand-ins, for framed portraits and tall cards. */
+const PORTRAITS = ["mission-community", "give-care", "hero-growth"];
+
+/** Landscape-shaped stand-ins, for bands, cards and wide frames. */
+const LANDSCAPES = [
+  "volunteer-aid",
+  "children-village",
+  "seedling",
+  "classroom-learning",
+  "health-outreach",
+];
 
 /**
- * Build a deterministic placeholder URL at the given intrinsic size.
+ * Slots addressed by a legacy numeric id rather than a seed. Kept so the
+ * pinned call sites (and older content) keep resolving to the intended
+ * subject after the move to local files.
+ */
+const CURATED_BY_ID: Record<number, string> = {
+  785: "hero-growth",
+  1001: "volunteer-aid",
+};
+
+/**
+ * Stable, cheap hash. It only needs to spread nearby seeds (project and gallery
+ * ids) across the pool; cryptographic strength would be wasted here.
+ */
+function seedIndex(seed: string, length: number): number {
+  let hash = 0;
+  for (let index = 0; index < seed.length; index += 1) {
+    hash = (hash * 31 + seed.charCodeAt(index)) >>> 0;
+  }
+  return hash % length;
+}
+
+function poolFor(width: number, height: number): string[] {
+  return height > width ? PORTRAITS : LANDSCAPES;
+}
+
+/**
+ * Resolve the stand-in for a slot.
  *
- * `width` and `height` set the source image's aspect ratio. Rendered size is
- * still controlled by CSS, so these only need to match the slot's proportions.
+ * `width` and `height` describe the slot's proportions and choose the right
+ * orientation. Rendered size is still controlled by CSS.
  */
 export function placeholderPhoto({
   seed,
@@ -33,16 +85,17 @@ export function placeholderPhoto({
   width: number;
   height: number;
 }): string {
-  return `${PICSUM_ORIGIN}/seed/${encodeURIComponent(seed)}/${width}/${height}`;
+  const pool = poolFor(width, height);
+  const name = CURATED[seed] ?? pool[seedIndex(seed, pool.length)];
+  return `${PLACEHOLDER_DIR}/${name}.jpg`;
 }
 
 /**
- * Build a URL for one specific picsum photograph.
+ * Resolve the stand-in for a slot addressed by a pinned id.
  *
- * `/seed/:seed` picks an arbitrary photo, which is fine for the collage but no
- * good when the image has to actually depict something — the hero backdrop
- * needs a landscape, not whatever the seed happens to land on. Picsum ids are
- * stable, so pinning one fixes the subject.
+ * The ids used to select picsum photographs. They are kept in the signature so
+ * the call sites written against them keep working; unknown ids fall back to
+ * the orientation-appropriate pool.
  */
 export function placeholderPhotoById({
   id,
@@ -53,24 +106,19 @@ export function placeholderPhotoById({
   width: number;
   height: number;
 }): string {
-  return `${PICSUM_ORIGIN}/id/${id}/${width}/${height}`;
+  const pool = poolFor(width, height);
+  const name =
+    CURATED_BY_ID[id] ?? pool[seedIndex(String(id), pool.length)];
+  return `${PLACEHOLDER_DIR}/${name}.jpg`;
 }
 
 /**
- * Both ids were picked by looking at the whole Picsum catalogue rather than
- * guessing from the number, so the subjects below are what the photographs
- * actually show.
- *
- * 785: cupped hands holding green growth — the closest thing to care and
- * stewardship in a placeholder library that has no aid photography in it.
+ * 785: cupped hands holding green growth — the hero portrait.
  */
 export const HERO_PHOTO_ID = 785;
 
 /**
- * 1001: an adult carrying a child across open ground. Chosen by previewing
- * the candidates at the scrim opacity they actually sit under — most survive
- * it as texture and nothing else, while this silhouette still reads as
- * people going somewhere, which is the only reason to put a photograph
- * behind a dark band at all.
+ * 1001: people moving across open ground — read as texture under the hero
+ * scrim, where only a human silhouette survives.
  */
 export const HERO_BACKDROP_ID = 1001;
