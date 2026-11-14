@@ -135,6 +135,52 @@ export const themeSchema = z.object({
 });
 
 /* -------------------------------------------------------------------------- */
+/* Admin users                                                                */
+/* -------------------------------------------------------------------------- */
+
+export const ADMIN_PASSWORD_MIN = 12;
+/** Upper bound only to keep a hostile request from hashing megabytes. */
+const ADMIN_PASSWORD_MAX = 128;
+
+export const adminUserSchema = z
+  .object({
+    // Normalised exactly as `loginAdmin` normalises what is typed at sign-in,
+    // so the stored address is always the one login will look up.
+    email: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .min(1, "Please enter an email address.")
+      .max(255, "That email address is too long.")
+      .email("Please enter a valid email address."),
+    name: z
+      .string()
+      .trim()
+      .min(1, "Please enter a name.")
+      .max(120, "That name is too long."),
+    password: z
+      .string()
+      .min(
+        ADMIN_PASSWORD_MIN,
+        `Use at least ${ADMIN_PASSWORD_MIN} characters.`,
+      )
+      .max(ADMIN_PASSWORD_MAX, `Use at most ${ADMIN_PASSWORD_MAX} characters.`),
+    confirmPassword: z.string().min(1, "Please confirm the password."),
+  })
+  .superRefine((value, ctx) => {
+    if (
+      value.confirmPassword.length > 0 &&
+      value.password !== value.confirmPassword
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["confirmPassword"],
+        message: "The passwords do not match.",
+      });
+    }
+  });
+
+/* -------------------------------------------------------------------------- */
 /* Media library                                                              */
 /* -------------------------------------------------------------------------- */
 
@@ -153,6 +199,8 @@ export type AdminActionState = {
   status: "idle" | "success" | "error";
   message?: string;
   fieldErrors?: Record<string, string>;
+  /** Submitted values echoed back on error, since React resets the form. */
+  values?: Record<string, string>;
 };
 
 export const ADMIN_IDLE: AdminActionState = { status: "idle" };

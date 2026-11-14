@@ -1,5 +1,4 @@
 import { existsSync } from "node:fs";
-import { hash } from "@node-rs/argon2";
 import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
@@ -19,6 +18,7 @@ import {
   theme,
   volunteers,
 } from "../src/db/schema";
+import { hashPassword } from "../src/lib/password";
 
 for (const file of [".env.local", ".env"]) {
   if (existsSync(file)) process.loadEnvFile(file);
@@ -485,11 +485,7 @@ async function main(): Promise<void> {
       RESTART IDENTITY CASCADE
     `);
 
-    const passwordHash = await hash(password, {
-      memoryCost: 19_456,
-      timeCost: 2,
-      parallelism: 1,
-    });
+    const passwordHash = await hashPassword(password);
 
     await db.insert(admins).values({
       email,

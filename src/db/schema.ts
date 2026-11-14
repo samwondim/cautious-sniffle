@@ -7,6 +7,7 @@ import {
   pgTable,
   text,
   timestamp,
+  uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
 
@@ -68,7 +69,7 @@ export const admins = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (table) => [index("admins_email_idx").on(table.email)],
+  (table) => [uniqueIndex("admins_email_idx").on(table.email)],
 );
 
 export const sessions = pgTable(

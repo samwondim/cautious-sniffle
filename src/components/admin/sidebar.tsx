@@ -77,6 +77,7 @@ const NAV: {
     section: "Inbox",
     icon: "message",
   },
+  { href: "/admin/users", label: "Admins", section: "Team", icon: "users" },
 ];
 
 const SECTIONS: { title: string; items: typeof NAV }[] = [];

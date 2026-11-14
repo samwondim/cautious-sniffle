@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 
 import { db } from "@/db";
 import {
+  admins,
   bankAccounts,
   donations,
   galleryImages,
@@ -22,6 +23,7 @@ import {
 } from "@/db/schema";
 import {
   accountSchema,
+  adminUserSchema,
   gallerySchema,
   givingSchema,
   projectSchema,
@@ -39,6 +41,7 @@ import {
 } from "@/lib/admin-actions";
 import { loginAdmin, logoutAdmin } from "@/lib/auth";
 import { fieldErrorsFrom } from "@/lib/forms";
+import { hashPassword } from "@/lib/password";
 
 /**
  * Admin Server Actions. Every mutation re-checks the session via `authed()` —
@@ -69,6 +72,93 @@ export async function logoutAction(): Promise<void> {
   await authed();
   await logoutAdmin();
   redirect("/admin/login");
+}
+
+/* -------------------------------------------------------------------------- */
+/* Admin users                                                                */
+/* -------------------------------------------------------------------------- */
+
+/** Postgres SQLSTATE for a unique-constraint violation. */
+const UNIQUE_VIOLATION = "23505";
+
+/** Walks `cause` because drizzle wraps the driver error in its own. */
+function isUniqueViolation(error: unknown): boolean {
+  for (let e: unknown = error, depth = 0; e && depth < 5; depth++) {
+    if (typeof e === "object" && (e as { code?: unknown }).code === UNIQUE_VIOLATION) {
+      return true;
+    }
+    e = (e as { cause?: unknown }).cause;
+  }
+  return false;
+}
+
+const DUPLICATE_EMAIL = "An admin with this email address already exists.";
+
+/**
+ * Creates another admin account. The schema has no roles — every admin has
+ * full access — so there is nothing to assign. The password is hashed here and
+ * is never placed in the returned state, so it cannot be echoed to the client.
+ */
+export async function createAdminUserAction(
+  _prev: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  await authed();
+
+  const raw = {
+    email: formString(formData, "email"),
+    name: formString(formData, "name"),
+    password: formString(formData, "password"),
+    confirmPassword: formString(formData, "confirmPassword"),
+  };
+  // Everything except the passwords may be handed back to refill the form.
+  const values = { email: raw.email, name: raw.name };
+
+  const parsed = adminUserSchema.safeParse(raw);
+  if (!parsed.success) {
+    return {
+      status: "error",
+      message: "Please check the highlighted fields.",
+      fieldErrors: fieldErrorsFrom(parsed.error),
+      values,
+    };
+  }
+  const { email, name, password } = parsed.data;
+
+  try {
+    const [existing] = await db
+      .select({ id: admins.id })
+      .from(admins)
+      .where(eq(admins.email, email))
+      .limit(1);
+    if (existing) {
+      return {
+        status: "error",
+        message: "Please check the highlighted fields.",
+        fieldErrors: { email: DUPLICATE_EMAIL },
+        values,
+      };
+    }
+    await db
+      .insert(admins)
+      .values({ email, name, passwordHash: await hashPassword(password) });
+  } catch (error) {
+    // Two submissions can pass the check above together; the unique index on
+    // `admins.email` is the real guard, so translate its error too.
+    if (isUniqueViolation(error)) {
+      return {
+        status: "error",
+        message: "Please check the highlighted fields.",
+        fieldErrors: { email: DUPLICATE_EMAIL },
+        values,
+      };
+    }
+    console.error("[admin] create admin user failed", error);
+    return { ...ERROR, values };
+  }
+
+  revalidatePath("/admin/users");
+  return { status: "success", message: `Added ${name} (${email}) as an admin.` };
 }
 
 /* -------------------------------------------------------------------------- */

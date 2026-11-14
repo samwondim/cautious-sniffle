@@ -13,7 +13,7 @@ do: credentials, real content and a sending domain.
 | 1 | **Change the production admin password.** The live admin still accepts the development seed password, which is published in `.env.example`. Anyone who reads the repository can sign in. | Samuel | Sign in at `/admin`, change the password (or reset it directly in the database), and give the client their own account. |
 | 2 | **Real bank account numbers.** All seven accounts on `/donate` are placeholders (`1000 0000 0000 01`, …). | Client finance team → admin | Admin → Bank accounts. Then clear *Site content → Donate page → placeholder notice* to remove the yellow warning banner. |
 | 3 | **Real contact details.** Phone is a fictional `+1 555` number; email and address are stand-ins. | Client → admin | Admin → Site content → Contact & social. |
-| 4 | **Apply the new database migration to production.** | Samuel | After deploying, run `npm run db:migrate` with production `DATABASE_URL`. It only rewrites values still at their old defaults; nothing the client edited is touched. |
+| 4 | **Apply the new database migrations to production.** | Samuel | After deploying, run `npm run db:migrate` with production `DATABASE_URL`. 0007 and 0008 only rewrite values still at their old defaults; nothing the client edited is touched. 0009 makes admin emails unique; it fails if two admins share an email, so remove any duplicate first. |
 
 ## 2. Content the client needs to supply
 
