@@ -57,7 +57,7 @@ export default async function AdminSectorEditPage({
             { name: "slug", label: "Slug", type: "text", hint: "Lowercase letters, numbers, dashes." },
             { name: "name", label: "Name", type: "text" },
             { name: "description", label: "Description", type: "textarea" },
-            { name: "icon", label: "Icon", type: "select", options: ICON_OPTIONS },
+            { name: "icon", label: "Icon", type: "icon", options: ICON_OPTIONS },
             { name: "sortOrder", label: "Sort order", type: "number" },
             {
               name: "status",

@@ -3,19 +3,15 @@ import { desc } from "drizzle-orm";
 import { deleteMediaAction } from "@/app/actions/media";
 import { MediaUploader } from "@/components/admin/media-uploader";
 import { CopyButton } from "@/components/admin/copy-button";
+import { OptimisticCardRow } from "@/components/admin/optimistic-row";
+import { DeleteButton } from "@/components/admin/ui";
 import { db } from "@/db";
 import { mediaAssets } from "@/db/schema";
 import { formatBytes, mediaPath, mediaRef } from "@/lib/media-constants";
 
 export const metadata = { title: "Media — Admin" };
 
-export default async function AdminMediaPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ error?: string; count?: string }>;
-}) {
-  const { error, count } = await searchParams;
-
+export default async function AdminMediaPage() {
   const rows = await db
     .select()
     .from(mediaAssets)
@@ -32,17 +28,6 @@ export default async function AdminMediaPage({
         </p>
       </div>
 
-      {error === "in-use" ? (
-        <p
-          role="status"
-          className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
-        >
-          That image is still used by {count ?? "some"} item
-          {count === "1" ? "" : "s"}. Remove it from them first, so the public
-          site does not lose a photograph.
-        </p>
-      ) : null}
-
       <MediaUploader />
 
       {rows.length === 0 ? (
@@ -52,7 +37,7 @@ export default async function AdminMediaPage({
       ) : (
         <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {rows.map((row) => (
-            <li
+            <OptimisticCardRow
               key={row.id}
               className="flex flex-col overflow-hidden rounded-2xl border border-hairline bg-white"
             >
@@ -87,18 +72,14 @@ export default async function AdminMediaPage({
                     label="image reference"
                     idleLabel="Copy reference"
                   />
-                  <form action={deleteMediaAction}>
-                    <input type="hidden" name="id" value={row.id} />
-                    <button
-                      type="submit"
-                      className="rounded-full border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors hover:bg-red-50"
-                    >
-                      Delete
-                    </button>
-                  </form>
+                  <DeleteButton
+                    id={row.id}
+                    action={deleteMediaAction}
+                    label="image"
+                  />
                 </div>
               </div>
-            </li>
+            </OptimisticCardRow>
           ))}
         </ul>
       )}

@@ -57,7 +57,7 @@ export default async function AdminStatEditPage({
             { name: "value", label: "Value (e.g. 12,400+)", type: "text" },
             { name: "label", label: "Label", type: "text" },
             { name: "detail", label: "Detail", type: "text" },
-            { name: "icon", label: "Icon", type: "select", options: ICON_OPTIONS },
+            { name: "icon", label: "Icon", type: "icon", options: ICON_OPTIONS },
             { name: "sortOrder", label: "Sort order", type: "number" },
             {
               name: "status",

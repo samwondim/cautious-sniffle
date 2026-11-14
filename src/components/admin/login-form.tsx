@@ -31,7 +31,7 @@ export function LoginForm() {
           className="field-input"
         />
       </AdminField>
-      <AdminSubmit label="Log in" />
+      <AdminSubmit label="Log in" pendingLabel="Logging in…" />
     </form>
   );
 }

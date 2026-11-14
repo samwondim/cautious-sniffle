@@ -10,6 +10,7 @@ import {
   authed,
   formString,
   revalidateSite,
+  type ActionResult,
 } from "@/lib/admin-actions";
 import { mediaAltSchema, uploadMetaSchema } from "@/lib/admin";
 import type { AdminActionState } from "@/lib/admin";
@@ -206,29 +207,48 @@ export async function updateMediaAltAction(
  * to stop a deletion that would leave a broken image on the public site. The
  * bytes go with the row through `ON DELETE CASCADE`.
  */
-export async function deleteMediaAction(formData: FormData): Promise<void> {
+export async function deleteMediaAction(
+  formData: FormData,
+): Promise<ActionResult> {
   await authed();
 
   const id = Number(formString(formData, "id"));
-  if (!Number.isFinite(id)) redirect("/admin/media");
-
-  const reference = mediaRef(id);
-  const [{ count: inProjects }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(projects)
-    .where(eq(projects.imageUrl, reference));
-  const [{ count: inGallery }] = await db
-    .select({ count: sql<number>`count(*)::int` })
-    .from(galleryImages)
-    .where(eq(galleryImages.imageUrl, reference));
-
-  const references = (inProjects ?? 0) + (inGallery ?? 0);
-  if (references > 0) {
-    redirect(`/admin/media?error=in-use&count=${references}`);
+  if (!Number.isFinite(id)) {
+    return { ok: false, message: "Invalid request." };
   }
 
-  await db.delete(mediaAssets).where(eq(mediaAssets.id, id));
+  const reference = mediaRef(id);
+
+  let references = 0;
+  try {
+    const [{ count: inProjects }] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(projects)
+      .where(eq(projects.imageUrl, reference));
+    const [{ count: inGallery }] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(galleryImages)
+      .where(eq(galleryImages.imageUrl, reference));
+    references = (inProjects ?? 0) + (inGallery ?? 0);
+  } catch (error) {
+    console.error("[admin] could not check image references", error);
+    return { ok: false, message: "Could not delete that image. Please try again." };
+  }
+
+  if (references > 0) {
+    return {
+      ok: false,
+      message: `Still used by ${references} item${references === 1 ? "" : "s"}. Remove it from them first, so the public site does not lose a photograph.`,
+    };
+  }
+
+  try {
+    await db.delete(mediaAssets).where(eq(mediaAssets.id, id));
+  } catch (error) {
+    console.error("[admin] could not delete image", error);
+    return { ok: false, message: "Could not delete that image. Please try again." };
+  }
 
   revalidateSite();
-  redirect("/admin/media");
+  return { ok: true };
 }

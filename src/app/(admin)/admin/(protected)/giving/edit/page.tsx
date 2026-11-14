@@ -57,7 +57,7 @@ export default async function AdminGivingEditPage({
           fields={[
             { name: "title", label: "Title", type: "text" },
             { name: "description", label: "Description", type: "textarea" },
-            { name: "icon", label: "Icon", type: "select", options: ICON_OPTIONS },
+            { name: "icon", label: "Icon", type: "icon", options: ICON_OPTIONS },
             { name: "ctaLabel", label: "Button label", type: "text" },
             { name: "ctaHref", label: "Button link", type: "text" },
             { name: "sortOrder", label: "Sort order", type: "number" },

@@ -1,4 +1,8 @@
+import { cookies } from "next/headers";
+
 import { AdminSidebar } from "@/components/admin/sidebar";
+import { ToastProvider } from "@/components/admin/toast";
+import { ADMIN_NAV_COOKIE } from "@/lib/admin-nav";
 import { requireAdmin } from "@/lib/auth";
 import { getAccent } from "@/lib/content";
 
@@ -15,16 +19,22 @@ export default async function AdminLayout({
   // inline property here every `text-accent` in the admin area silently fell
   // back to the `:root` teal. Mirrors `src/app/(site)/layout.tsx`.
   const accent = await getAccent();
+  // Sidebar rail preference, written client-side on toggle. Reading it here
+  // (rather than in an effect) keeps the first paint in sync with the cookie.
+  const navCollapsed =
+    (await cookies()).get(ADMIN_NAV_COOKIE)?.value === "collapsed";
 
   return (
-    <div
-      style={{ "--accent": accent } as React.CSSProperties}
-      className="flex min-h-screen flex-col bg-[#f2f6f7] font-sans text-ink md:flex-row"
-    >
-      <AdminSidebar email={session.email} />
-      <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 md:px-10 md:py-8">
-        <div className="mx-auto max-w-[1100px]">{children}</div>
-      </main>
-    </div>
+    <ToastProvider>
+      <div
+        style={{ "--accent": accent } as React.CSSProperties}
+        className="flex min-h-screen flex-col bg-[#f2f6f7] font-sans text-ink md:flex-row"
+      >
+        <AdminSidebar email={session.email} defaultCollapsed={navCollapsed} />
+        <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 md:px-10 md:py-8">
+          <div className="mx-auto max-w-[1100px]">{children}</div>
+        </main>
+      </div>
+    </ToastProvider>
   );
 }

@@ -17,6 +17,8 @@ import {
   siteSettings,
   theme,
   volunteers,
+  type DonationStatus,
+  type LeadStatus,
 } from "@/db/schema";
 import {
   accountSchema,
@@ -33,6 +35,7 @@ import {
   authed,
   formString,
   revalidateSite,
+  type ActionResult,
 } from "@/lib/admin-actions";
 import { loginAdmin, logoutAdmin } from "@/lib/auth";
 import { fieldErrorsFrom } from "@/lib/forms";
@@ -173,17 +176,21 @@ export async function upsertSectorAction(
     return { status: "error", message: "Save failed — is the slug unique?" };
   }
   revalidateSite();
-  redirect("/admin/sectors");
+  redirect("/admin/sectors?saved=1");
 }
 
-export async function deleteSectorAction(formData: FormData): Promise<void> {
+export async function deleteSectorAction(formData: FormData): Promise<ActionResult> {
   await authed();
   const id = Number(formString(formData, "id"));
-  if (Number.isFinite(id)) {
+  if (!Number.isFinite(id)) return { ok: false, message: "Invalid request." };
+  try {
     await db.delete(sectors).where(eq(sectors.id, id));
+  } catch (error) {
+    console.error("[admin] delete sector failed", error);
+    return { ok: false, message: "Could not delete. Please try again." };
   }
   revalidateSite();
-  redirect("/admin/sectors");
+  return { ok: true };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -232,17 +239,21 @@ export async function upsertProjectAction(
     return ERROR;
   }
   revalidateSite();
-  redirect("/admin/projects");
+  redirect("/admin/projects?saved=1");
 }
 
-export async function deleteProjectAction(formData: FormData): Promise<void> {
+export async function deleteProjectAction(formData: FormData): Promise<ActionResult> {
   await authed();
   const id = Number(formString(formData, "id"));
-  if (Number.isFinite(id)) {
+  if (!Number.isFinite(id)) return { ok: false, message: "Invalid request." };
+  try {
     await db.delete(projects).where(eq(projects.id, id));
+  } catch (error) {
+    console.error("[admin] delete project failed", error);
+    return { ok: false, message: "Could not delete. Please try again." };
   }
   revalidateSite();
-  redirect("/admin/projects");
+  return { ok: true };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -284,17 +295,21 @@ export async function upsertStatAction(
     return ERROR;
   }
   revalidateSite();
-  redirect("/admin/stats");
+  redirect("/admin/stats?saved=1");
 }
 
-export async function deleteStatAction(formData: FormData): Promise<void> {
+export async function deleteStatAction(formData: FormData): Promise<ActionResult> {
   await authed();
   const id = Number(formString(formData, "id"));
-  if (Number.isFinite(id)) {
+  if (!Number.isFinite(id)) return { ok: false, message: "Invalid request." };
+  try {
     await db.delete(impactStats).where(eq(impactStats.id, id));
+  } catch (error) {
+    console.error("[admin] delete stat failed", error);
+    return { ok: false, message: "Could not delete. Please try again." };
   }
   revalidateSite();
-  redirect("/admin/stats");
+  return { ok: true };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -337,17 +352,21 @@ export async function upsertGivingAction(
     return ERROR;
   }
   revalidateSite();
-  redirect("/admin/giving");
+  redirect("/admin/giving?saved=1");
 }
 
-export async function deleteGivingAction(formData: FormData): Promise<void> {
+export async function deleteGivingAction(formData: FormData): Promise<ActionResult> {
   await authed();
   const id = Number(formString(formData, "id"));
-  if (Number.isFinite(id)) {
+  if (!Number.isFinite(id)) return { ok: false, message: "Invalid request." };
+  try {
     await db.delete(givingOptions).where(eq(givingOptions.id, id));
+  } catch (error) {
+    console.error("[admin] delete giving option failed", error);
+    return { ok: false, message: "Could not delete. Please try again." };
   }
   revalidateSite();
-  redirect("/admin/giving");
+  return { ok: true };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -393,17 +412,21 @@ export async function upsertAccountAction(
     return ERROR;
   }
   revalidateSite();
-  redirect("/admin/accounts");
+  redirect("/admin/accounts?saved=1");
 }
 
-export async function deleteAccountAction(formData: FormData): Promise<void> {
+export async function deleteAccountAction(formData: FormData): Promise<ActionResult> {
   await authed();
   const id = Number(formString(formData, "id"));
-  if (Number.isFinite(id)) {
+  if (!Number.isFinite(id)) return { ok: false, message: "Invalid request." };
+  try {
     await db.delete(bankAccounts).where(eq(bankAccounts.id, id));
+  } catch (error) {
+    console.error("[admin] delete bank account failed", error);
+    return { ok: false, message: "Could not delete. Please try again." };
   }
   revalidateSite();
-  redirect("/admin/accounts");
+  return { ok: true };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -444,60 +467,98 @@ export async function upsertGalleryAction(
     return ERROR;
   }
   revalidateSite();
-  redirect("/admin/gallery");
+  redirect("/admin/gallery?saved=1");
 }
 
-export async function deleteGalleryAction(formData: FormData): Promise<void> {
+export async function deleteGalleryAction(formData: FormData): Promise<ActionResult> {
   await authed();
   const id = Number(formString(formData, "id"));
-  if (Number.isFinite(id)) {
+  if (!Number.isFinite(id)) return { ok: false, message: "Invalid request." };
+  try {
     await db.delete(galleryImages).where(eq(galleryImages.id, id));
+  } catch (error) {
+    console.error("[admin] delete gallery image failed", error);
+    return { ok: false, message: "Could not delete. Please try again." };
   }
   revalidateSite();
-  redirect("/admin/gallery");
+  return { ok: true };
 }
 
 /* -------------------------------------------------------------------------- */
 /* Submission statuses (donations / volunteers / messages)                    */
 /* -------------------------------------------------------------------------- */
 
+/** Result shape the optimistic status control consumes. */
+export type StatusResult = { ok: true } | { ok: false; message: string };
+
+const DONATION_STATUSES: readonly string[] = [
+  "pending",
+  "completed",
+  "refunded",
+  "failed",
+];
+const LEAD_STATUSES: readonly string[] = ["new", "in_progress", "archived"];
+
+/** Narrows a form string to the enum after a runtime membership check. */
+function isDonationStatus(value: string): value is DonationStatus {
+  return DONATION_STATUSES.includes(value);
+}
+
+function isLeadStatus(value: string): value is LeadStatus {
+  return LEAD_STATUSES.includes(value);
+}
+
 export async function updateDonationStatusAction(
   formData: FormData,
-): Promise<void> {
+): Promise<StatusResult> {
   await authed();
   const id = Number(formString(formData, "id"));
   const status = formString(formData, "status");
-  if (
-    Number.isFinite(id) &&
-    ["pending", "completed", "refunded", "failed"].includes(status)
-  ) {
-    await db
-      .update(donations)
-      .set({ status: status as "pending" })
-      .where(eq(donations.id, id));
+  if (!Number.isFinite(id)) return { ok: false, message: "Invalid record." };
+  if (!isDonationStatus(status)) {
+    return { ok: false, message: "That status is not recognised." };
+  }
+  try {
+    await db.update(donations).set({ status }).where(eq(donations.id, id));
+  } catch (error) {
+    console.error("[admin] update donation status failed", error);
+    return { ok: false, message: "Could not update. Please try again." };
   }
   revalidatePath("/admin/donations");
+  // The overview's confirmed total and "to confirm" count read these rows.
+  revalidatePath("/admin");
+  return { ok: true };
 }
 
 export async function updateLeadStatusAction(
   formData: FormData,
-): Promise<void> {
+): Promise<StatusResult> {
   await authed();
   const id = Number(formString(formData, "id"));
   const kind = formString(formData, "kind");
   const status = formString(formData, "status");
-  if (
-    !Number.isFinite(id) ||
-    !["new", "in_progress", "archived"].includes(status)
-  ) {
-    return;
+  if (!Number.isFinite(id)) return { ok: false, message: "Invalid record." };
+  if (!isLeadStatus(status)) {
+    return { ok: false, message: "That status is not recognised." };
   }
-  const value = status as "new";
-  if (kind === "volunteer") {
-    await db.update(volunteers).set({ status: value }).where(eq(volunteers.id, id));
-    revalidatePath("/admin/volunteers");
-  } else if (kind === "message") {
-    await db.update(messages).set({ status: value }).where(eq(messages.id, id));
-    revalidatePath("/admin/messages");
+  try {
+    if (kind === "volunteer") {
+      await db
+        .update(volunteers)
+        .set({ status })
+        .where(eq(volunteers.id, id));
+      revalidatePath("/admin/volunteers");
+    } else if (kind === "message") {
+      await db.update(messages).set({ status }).where(eq(messages.id, id));
+      revalidatePath("/admin/messages");
+    } else {
+      return { ok: false, message: "That record type is not recognised." };
+    }
+  } catch (error) {
+    console.error("[admin] update lead status failed", error);
+    return { ok: false, message: "Could not update. Please try again." };
   }
+  // The overview counts new volunteers and messages.
+  revalidatePath("/admin");
+  return { ok: true };
 }

@@ -9,7 +9,10 @@ import { useEffect, useRef } from "react";
  * inert page behind, and a real focus trap — all of which would otherwise be
  * hand-rolled, since this project has no component library. The UA's default
  * centred box is reset here so callers control position and size entirely
- * through `className`.
+ * through `className` — but only while open: a closed `<dialog>` is forced
+ * `hidden`, because author `display` utilities (e.g. `flex`) otherwise beat
+ * the UA's `dialog:not([open]) { display: none }` and leave an invisible
+ * full-size overlay swallowing clicks on the page behind it.
  *
  * Escape is routed through React state rather than letting the browser close
  * the dialog on its own, so `open` never disagrees with what's on screen.
@@ -65,7 +68,7 @@ export function AdminModal({
         // the element itself (rather than a child) is a backdrop click.
         if (event.target === ref.current) onClose();
       }}
-      className={`m-0 max-h-none max-w-none bg-transparent p-0 text-ink backdrop:bg-ink-deep/60 ${className}`}
+      className={`m-0 max-h-none max-w-none bg-transparent p-0 text-ink backdrop:bg-ink-deep/60 ${open ? className : "hidden"}`}
     >
       {children}
     </dialog>

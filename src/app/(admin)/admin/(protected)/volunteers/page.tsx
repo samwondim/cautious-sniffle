@@ -1,17 +1,24 @@
-import { desc } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, or, sql } from "drizzle-orm";
 
 import { updateLeadStatusAction } from "@/app/actions/admin";
-import {
-  AdminTable,
-  StatusForm,
-  type AdminColumn,
-} from "@/components/admin/table";
+import { ListMeta } from "@/components/admin/list-meta";
+import { ListToolbar } from "@/components/admin/list-toolbar";
+import { StatusForm } from "@/components/admin/status-form";
+import { AdminTable, type AdminColumn } from "@/components/admin/table";
+import { AdminTabs } from "@/components/admin/tabs";
 import { db } from "@/db";
-import { volunteers, type Volunteer } from "@/db/schema";
+import { volunteers, type LeadStatus, type Volunteer } from "@/db/schema";
 
 export const metadata = { title: "Volunteers — Admin" };
 
-const STATUSES = ["new", "in_progress", "archived"] as const;
+const STATUSES: readonly LeadStatus[] = ["new", "in_progress", "archived"];
+const DEFAULT_STATUS: LeadStatus = "new";
+
+const SORT_OPTIONS = [
+  { value: "newest", label: "Newest first" },
+  { value: "oldest", label: "Oldest first" },
+  { value: "name", label: "Name A–Z" },
+];
 
 const COLUMNS: AdminColumn<Volunteer>[] = [
   {
@@ -50,12 +57,68 @@ const COLUMNS: AdminColumn<Volunteer>[] = [
   },
 ];
 
-export default async function AdminVolunteersPage() {
-  const rows = await db
-    .select()
-    .from(volunteers)
-    .orderBy(desc(volunteers.createdAt), desc(volunteers.id))
-    .limit(100);
+function orderFor(sort: string | undefined) {
+  switch (sort) {
+    case "oldest":
+      return [asc(volunteers.createdAt), asc(volunteers.id)];
+    case "name":
+      return [asc(volunteers.name), asc(volunteers.id)];
+    default:
+      return [desc(volunteers.createdAt), desc(volunteers.id)];
+  }
+}
+
+export default async function AdminVolunteersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; sort?: string; status?: string }>;
+}) {
+  const { q, sort, status } = await searchParams;
+  const term = q?.trim();
+
+  const statusParam = status ?? DEFAULT_STATUS;
+  const statusFilter: LeadStatus | undefined =
+    statusParam === "all"
+      ? undefined
+      : STATUSES.includes(statusParam as LeadStatus)
+        ? (statusParam as LeadStatus)
+        : DEFAULT_STATUS;
+
+  const [rows, counts] = await Promise.all([
+    db
+      .select()
+      .from(volunteers)
+      .where(
+        and(
+          statusFilter ? eq(volunteers.status, statusFilter) : undefined,
+          term
+            ? or(
+                ilike(volunteers.name, `%${term}%`),
+                ilike(volunteers.email, `%${term}%`),
+                ilike(volunteers.message, `%${term}%`),
+              )
+            : undefined,
+        ),
+      )
+      .orderBy(...orderFor(sort))
+      .limit(100),
+    db
+      .select({ status: volunteers.status, count: sql<number>`count(*)::int` })
+      .from(volunteers)
+      .groupBy(volunteers.status),
+  ]);
+
+  const countBy = new Map(counts.map((c) => [c.status, c.count]));
+  const total = counts.reduce((sum, c) => sum + c.count, 0);
+  const tabs = [
+    { value: "new", label: "New", count: countBy.get("new") ?? 0 },
+    { value: "in_progress", label: "In progress", count: countBy.get("in_progress") ?? 0 },
+    { value: "archived", label: "Archived", count: countBy.get("archived") ?? 0 },
+    { value: "all", label: "All", count: total },
+  ];
+
+  const filtered =
+    Boolean(term) || (statusParam !== DEFAULT_STATUS && statusParam !== "all");
 
   return (
     <div className="flex flex-col gap-6">
@@ -65,6 +128,22 @@ export default async function AdminVolunteersPage() {
           Sign-ups from the volunteer form. Latest 100 shown.
         </p>
       </div>
+
+      <AdminTabs
+        options={tabs}
+        current={status}
+        baseHref="/admin/volunteers"
+        preserve={{ q, sort }}
+      />
+      <ListToolbar
+        sortOptions={SORT_OPTIONS}
+        searchPlaceholder="Search names, emails, messages…"
+      />
+      <ListMeta
+        count={rows.length}
+        filtered={filtered}
+        clearHref="/admin/volunteers"
+      />
 
       <AdminTable
         rows={rows}

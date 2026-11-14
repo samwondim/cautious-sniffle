@@ -37,6 +37,13 @@ export const ERROR: AdminActionState = {
   message: "Something went wrong. Please try again.",
 };
 
+/**
+ * Result of an action the client calls directly (e.g. the optimistic delete
+ * button) rather than through a `useActionState` form. The client needs a
+ * value back to decide whether to keep the optimistic change or roll it back.
+ */
+export type ActionResult = { ok: true } | { ok: false; message: string };
+
 /** Content edits can surface anywhere on the public site, so revalidate it all. */
 export function revalidateSite() {
   revalidatePath("/", "layout");

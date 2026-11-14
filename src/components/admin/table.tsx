@@ -1,5 +1,11 @@
 import Link from "next/link";
 
+import {
+  OptimisticCardRow,
+  OptimisticTableRow,
+} from "@/components/admin/optimistic-row";
+import { statusLabel } from "@/lib/status";
+
 /**
  * The pieces every admin list page is built from.
  *
@@ -88,7 +94,7 @@ export function AdminTable<T>({
               </tr>
             ) : (
               rows.map((row) => (
-                <tr
+                <OptimisticTableRow
                   key={rowKey(row)}
                   className={`border-b border-hairline last:border-0 ${
                     rowAlign === "top" ? "align-top" : ""
@@ -106,7 +112,7 @@ export function AdminTable<T>({
                       {column.cell(row)}
                     </td>
                   ))}
-                </tr>
+                </OptimisticTableRow>
               ))
             )}
           </tbody>
@@ -121,7 +127,7 @@ export function AdminTable<T>({
       ) : (
         <ul className="flex flex-col gap-3 md:hidden">
           {rows.map((row) => (
-            <li
+            <OptimisticCardRow
               key={rowKey(row)}
               className="rounded-2xl border border-hairline bg-white p-4"
             >
@@ -150,7 +156,7 @@ export function AdminTable<T>({
                   {column.cell(row)}
                 </div>
               ))}
-            </li>
+            </OptimisticCardRow>
           ))}
         </ul>
       )}
@@ -158,11 +164,21 @@ export function AdminTable<T>({
   );
 }
 
-/** Publication-status pill, shared by every list page that shows one. */
+/** Statuses that are waiting on a person, tinted so they stand out. */
+const NEEDS_ATTENTION = new Set(["new", "pending"]);
+
+/** Status pill, shared by every list page and the overview. */
 export function StatusBadge({ status }: { status: string }) {
+  const attention = NEEDS_ATTENTION.has(status);
   return (
-    <span className="rounded-full bg-mint px-2.5 py-1 text-xs font-semibold text-accent">
-      {status}
+    <span
+      className={
+        attention
+          ? "shrink-0 rounded-full bg-gold/20 px-2.5 py-1 text-xs font-semibold text-ink"
+          : "shrink-0 rounded-full bg-mint px-2.5 py-1 text-xs font-semibold text-accent"
+      }
+    >
+      {statusLabel(status)}
     </span>
   );
 }
@@ -186,50 +202,5 @@ export function EditLink({ href }: { href: string }) {
 export function RowActions({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-wrap gap-2 md:justify-end">{children}</div>
-  );
-}
-
-/**
- * Inline status control for the inbox pages. Posts straight to a Server
- * Action, so it stays a Server Component and needs no client JavaScript.
- * `kind` is the discriminator `updateLeadStatusAction` uses to tell
- * volunteers from messages; donations have their own action and omit it.
- */
-export function StatusForm({
-  action,
-  id,
-  kind,
-  status,
-  options,
-}: {
-  action: (formData: FormData) => Promise<void>;
-  id: number;
-  kind?: string;
-  status: string;
-  options: readonly string[];
-}) {
-  return (
-    <form action={action} className="flex items-center gap-2">
-      <input type="hidden" name="id" value={id} />
-      {kind ? <input type="hidden" name="kind" value={kind} /> : null}
-      <select
-        name="status"
-        defaultValue={status}
-        aria-label="Status"
-        className="h-9 rounded-lg border border-hairline bg-white px-2 text-xs font-medium text-ink"
-      >
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
-      <button
-        type="submit"
-        className="rounded-full border border-hairline px-3 py-1.5 text-xs font-semibold text-ink transition-colors hover:border-teal"
-      >
-        Set
-      </button>
-    </form>
   );
 }

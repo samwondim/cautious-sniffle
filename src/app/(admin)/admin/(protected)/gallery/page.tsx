@@ -1,7 +1,10 @@
 import Link from "next/link";
-import { asc } from "drizzle-orm";
+import { and, asc, eq, ilike, or, sql } from "drizzle-orm";
 
 import { deleteGalleryAction } from "@/app/actions/admin";
+import { FlashToast } from "@/components/admin/flash-toast";
+import { ListMeta } from "@/components/admin/list-meta";
+import { ListToolbar } from "@/components/admin/list-toolbar";
 import {
   AdminTable,
   EditLink,
@@ -9,11 +12,19 @@ import {
   StatusBadge,
   type AdminColumn,
 } from "@/components/admin/table";
+import { AdminTabs } from "@/components/admin/tabs";
 import { DeleteButton } from "@/components/admin/ui";
 import { db } from "@/db";
 import { galleryImages, type GalleryImage } from "@/db/schema";
 
 export const metadata = { title: "Gallery — Admin" };
+
+const SORT_OPTIONS = [
+  { value: "order", label: "Sort order" },
+  { value: "title", label: "Title A–Z" },
+];
+
+const CONTENT_STATUSES = ["draft", "published"] as const;
 
 const COLUMNS: AdminColumn<GalleryImage>[] = [
   { header: "Title", cell: (row) => row.title, mobile: "title" },
@@ -56,14 +67,69 @@ const COLUMNS: AdminColumn<GalleryImage>[] = [
   },
 ];
 
-export default async function AdminGalleryPage() {
-  const rows = await db
-    .select()
-    .from(galleryImages)
-    .orderBy(asc(galleryImages.sortOrder), asc(galleryImages.id));
+export default async function AdminGalleryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    q?: string;
+    sort?: string;
+    status?: string;
+    saved?: string;
+  }>;
+}) {
+  const { q, sort, status, saved } = await searchParams;
+  const term = q?.trim();
+  const statusFilter =
+    status && (CONTENT_STATUSES as readonly string[]).includes(status)
+      ? (status as (typeof CONTENT_STATUSES)[number])
+      : undefined;
+
+  const [rows, counts] = await Promise.all([
+    db
+      .select()
+      .from(galleryImages)
+      .where(
+        and(
+          statusFilter ? eq(galleryImages.status, statusFilter) : undefined,
+          term
+            ? or(
+                ilike(galleryImages.title, `%${term}%`),
+                ilike(galleryImages.caption, `%${term}%`),
+              )
+            : undefined,
+        ),
+      )
+      .orderBy(
+        ...(sort === "title"
+          ? [asc(galleryImages.title), asc(galleryImages.id)]
+          : [asc(galleryImages.sortOrder), asc(galleryImages.id)]),
+      ),
+    db
+      .select({
+        status: galleryImages.status,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(galleryImages)
+      .groupBy(galleryImages.status),
+  ]);
+
+  const countBy = new Map(counts.map((row) => [row.status, row.count]));
+  const total = counts.reduce((sum, row) => sum + row.count, 0);
+  const tabs = [
+    { value: "all", label: "All", count: total },
+    { value: "draft", label: "Draft", count: countBy.get("draft") ?? 0 },
+    {
+      value: "published",
+      label: "Published",
+      count: countBy.get("published") ?? 0,
+    },
+  ];
 
   return (
     <div className="flex flex-col gap-6">
+      {saved ? (
+        <FlashToast message="Gallery image saved — live on the site now." />
+      ) : null}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-display text-3xl text-ink">Gallery</h1>
@@ -79,6 +145,22 @@ export default async function AdminGalleryPage() {
           New image
         </Link>
       </div>
+
+      <AdminTabs
+        options={tabs}
+        current={status}
+        baseHref="/admin/gallery"
+        preserve={{ q, sort }}
+      />
+      <ListToolbar
+        sortOptions={SORT_OPTIONS}
+        searchPlaceholder="Search gallery images…"
+      />
+      <ListMeta
+        count={rows.length}
+        filtered={Boolean(term) || Boolean(statusFilter)}
+        clearHref="/admin/gallery"
+      />
 
       <AdminTable
         rows={rows}
